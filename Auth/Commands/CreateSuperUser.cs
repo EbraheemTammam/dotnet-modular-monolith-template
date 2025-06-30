@@ -46,30 +46,30 @@ public class CreateSuperUserCommand
             passwordArg
         };
 
-        command.SetHandler(async () =>
+        command.SetHandler(async (firstName, lastName, email, password) =>
         {
-            string firstName = GetConsoleInput("Enter first name: ", value =>
+            firstName = GetConsoleInputIfEmpty(firstName, "Enter first name: ", value =>
             {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("A first name is required.");
                 return value;
             });
 
-            string lastName = GetConsoleInput("Enter last name: ", value =>
+            lastName = GetConsoleInputIfEmpty(lastName, "Enter last name: ", value =>
             {
                 if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("A last name is required.");
                 return value;
             });
 
-            string email = GetConsoleInput("Enter email address: ", value =>
+            email = GetConsoleInputIfEmpty(email, "Enter email address: ", value =>
             {
                 if (string.IsNullOrWhiteSpace(value) || !value.Contains("@"))
                     throw new ArgumentException("A valid email address is required.");
                 return value;
             });
 
-            string password = GetConsoleInput("Enter password: ", value =>
+            password = GetConsoleInputIfEmpty(password, "Enter password: ", value =>
             {
                 if (string.IsNullOrWhiteSpace(value) || value.Length < 6)
                     throw new ArgumentException("Password must be at least 6 characters long.");
@@ -99,17 +99,21 @@ public class CreateSuperUserCommand
                     Console.WriteLine($"- {error.Description}");
                 }
             }
-        });
+        }, firstNameArg, lastNameArg, emailArg, passwordArg);
 
         return command;
     }
 
-    private static string GetConsoleInput(
+    private static string GetConsoleInputIfEmpty(
+        string input,
         string prompt,
         Func<string, string> validator,
         bool hideInput = false
     )
     {
+        if (!string.IsNullOrWhiteSpace(input))
+            return input;
+
         Console.Write(prompt);
         string? value;
         if (hideInput)

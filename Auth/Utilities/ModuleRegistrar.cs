@@ -8,6 +8,7 @@ using Auth.Data;
 using Auth.Interfaces;
 using Auth.Services;
 using Auth.Models;
+using Auth.Commands;
 
 namespace Auth.Utilities;
 
@@ -30,5 +31,6 @@ public class AuthModuleRegistrar : IModuleRegistrar
 
         services.AddScoped<ICookieAuthService, CookieAuthService>();
         services.AddScoped<ICurrentLoggedInUser, CurrentLoggedInUser>();
+        services.AddScoped<CreateSuperUserCommand>();
     }
 }
