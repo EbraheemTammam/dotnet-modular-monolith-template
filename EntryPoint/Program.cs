@@ -1,6 +1,7 @@
 using System.CommandLine;
 using DotNetEnv;
 
+using Base.Commands;
 using Auth.Commands;
 using EntryPoint.Utilities;
 
@@ -13,16 +14,30 @@ string[] modules = ["Base", "Auth"];
 
 builder.Services.RegisterModules(builder.Configuration, modules);
 builder.Services.Configure(builder.Configuration);
-builder.Services.AddScoped<CreateSuperUserCommand>();
 
 var app = builder.Build();
 
-if (args.Length > 0 && args[0].ToLower() == "createsuperuser")
+if (args.Length > 0)
 {
     using var scope = app.Services.CreateScope();
-    var command = scope.ServiceProvider.GetRequiredService<CreateSuperUserCommand>();
     var rootCommand = new RootCommand("ASP.NET Core CLI commands");
-    rootCommand.AddCommand(command.CreateCommand());
+
+    if (args[0].ToLower() == "createsuperuser")
+    {
+        var command = scope.ServiceProvider.GetRequiredService<CreateSuperUserCommand>();
+        rootCommand.AddCommand(command.CreateCommand());
+    }
+    else if (args[0].ToLower() == "makemigrations")
+    {
+        if (args.Length < 2) args = args.Concat(modules[1..]).ToArray();
+        if (!modules.Contains(args[1]))
+        {
+            Console.WriteLine($"Module '{args[1]}' not found.");
+            return;
+        }
+        var command = scope.ServiceProvider.GetRequiredService<MakeMigrationsCommand>();
+        rootCommand.AddCommand(command.CreateCommand());
+    }
     await rootCommand.InvokeAsync(args);
 }
 else
