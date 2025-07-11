@@ -11,5 +11,6 @@ public class BaseModuleRegistrar : IModuleRegistrar
     public void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<MakeMigrationsCommand>();
+        services.AddScoped<StartAppCommand>();
     }
 }
