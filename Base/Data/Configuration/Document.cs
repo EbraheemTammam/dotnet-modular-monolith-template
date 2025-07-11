@@ -1,0 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using Base.Models;
+
+namespace Base.Data.Configuration;
+
+public class DocumentConfiguration : IEntityTypeConfiguration<Document>
+{
+    public void Configure(EntityTypeBuilder<Document> builder)
+    {
+        builder.Property(d => d.FileName).HasMaxLength(100);
+        builder.Property(d => d.SaveTo).HasMaxLength(100);
+        builder.Property(d => d.Domain).HasMaxLength(100);
+    }
+}

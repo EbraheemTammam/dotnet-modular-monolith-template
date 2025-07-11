@@ -172,7 +172,6 @@ public class {0}ModuleRegistrar : IModuleRegistrar
 
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Models"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "DTOs"));
-            Directory.CreateDirectory(Path.Combine(basePath, appName, "Mappers"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Queries"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Interfaces"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Services"));

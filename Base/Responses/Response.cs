@@ -47,4 +47,11 @@ public sealed record Response<TData> : Response
         Data = data;
     }
     public static Response<TData> Success(TData data, int statusCode = 200) => new(statusCode, data, true);
+    public static new Response<TData> Fail(string? message = null, int statusCode = 400) => new(statusCode, default, false, message);
+    public static new Response<TData> NotFound(Guid id, string resource, string idField = "id") =>
+        new(404, default, false, $"{resource} with {idField} {id} Not Found");
+    public static new Response<TData> BadRequest(string message) => new(400, default, false, message);
+    public static new Response<TData> InternalServerError = new(500, default, false, "Something went wrong");
+    public static new Response<TData> UnAuthorized = new(401, default, false, "Email or password is incorrect");
+    public static new Response<TData> Forbidden = new(403, default, false, "Permission denied");
 }
