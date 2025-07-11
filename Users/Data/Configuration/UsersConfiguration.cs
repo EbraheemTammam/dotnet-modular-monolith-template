@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Auth.Models;
+using Users.Models;
 
-namespace Auth.Data.Configuration;
+namespace Users.Data.Configuration;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

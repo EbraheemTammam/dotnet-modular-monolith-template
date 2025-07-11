@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 
 using Base.Responses;
+using Users.Models;
 using Auth.DTOs;
 using Auth.Interfaces;
-using Auth.Models;
 
 namespace Auth.Services;
 
@@ -18,7 +18,7 @@ public class CookieAuthService : ICookieAuthService
         _signInManager = signInManager;
     }
 
-     public async Task<Response> LoginAsync(LoginDTO loginDTO)
+    public async Task<Response> LoginAsync(LoginDTO loginDTO)
     {
         User? user = await _userManager.FindByEmailAsync(loginDTO.Email);
         if(user is not null)

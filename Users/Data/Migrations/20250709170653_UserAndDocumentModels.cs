@@ -4,14 +4,28 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Auth.Data.Migrations
+namespace Users.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UserModel : Migration
+    public partial class UserAndDocumentModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Document",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    SaveTo = table.Column<string>(type: "text", nullable: false),
+                    Domain = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Document", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
@@ -33,6 +47,8 @@ namespace Auth.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
+                    ProfilePictureId = table.Column<Guid>(type: "uuid", nullable: true),
+                    WalletBalance = table.Column<float>(type: "real", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -51,6 +67,11 @@ namespace Auth.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Document_ProfilePictureId",
+                        column: x => x.ProfilePictureId,
+                        principalTable: "Document",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -166,6 +187,11 @@ namespace Auth.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_ProfilePictureId",
+                table: "Users",
+                column: "ProfilePictureId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "Users",
                 column: "NormalizedUserName",
@@ -192,6 +218,9 @@ namespace Auth.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Document");
         }
     }
 }

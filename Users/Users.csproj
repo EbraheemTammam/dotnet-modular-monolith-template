@@ -2,7 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Base\Base.csproj" />
-    <ProjectReference Include="..\Users\Users.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
   </ItemGroup>
 
   <PropertyGroup>

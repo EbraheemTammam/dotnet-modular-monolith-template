@@ -1,9 +1,9 @@
 using System.CommandLine;
 using Microsoft.AspNetCore.Identity;
 
-using Auth.Models;
+using Users.Models;
 
-namespace Auth.Commands;
+namespace Users.Commands;
 
 public class CreateSuperUserCommand
 {

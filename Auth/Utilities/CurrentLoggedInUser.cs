@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 
+using Users.Models;
 using Auth.Interfaces;
-using Auth.Models;
 
 namespace Auth.Utilities;
 
