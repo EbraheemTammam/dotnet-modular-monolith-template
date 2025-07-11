@@ -2,7 +2,7 @@ using System.CommandLine;
 using DotNetEnv;
 
 using Base.Commands;
-using Auth.Commands;
+using Users.Commands;
 using EntryPoint.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 
-string[] modules = ["Base", "Auth"];
+string[] modules = ["Base", "Users", "Auth"];
 
 builder.Services.RegisterModules(builder.Configuration, modules);
 builder.Services.Configure(builder.Configuration);
@@ -25,6 +25,11 @@ if (args.Length > 0)
     if (args[0].ToLower() == "createsuperuser")
     {
         var command = scope.ServiceProvider.GetRequiredService<CreateSuperUserCommand>();
+        rootCommand.AddCommand(command.CreateCommand());
+    }
+    else if (args[0].ToLower() == "startapp")
+    {
+        var command = scope.ServiceProvider.GetRequiredService<StartAppCommand>();
         rootCommand.AddCommand(command.CreateCommand());
     }
     else if (args[0].ToLower() == "makemigrations")

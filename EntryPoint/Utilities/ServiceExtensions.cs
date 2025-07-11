@@ -1,5 +1,4 @@
 using Base.Interfaces;
-using Auth.Models;
 using Auth.Utilities;
 
 namespace EntryPoint.Utilities;

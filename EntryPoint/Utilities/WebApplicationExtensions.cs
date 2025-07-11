@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-
-using Auth.Models;
 
 namespace EntryPoint.Utilities;
 
