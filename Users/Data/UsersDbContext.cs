@@ -6,7 +6,7 @@ using Users.Models;
 
 namespace Users.Data;
 
-public sealed class UsersDbContext: IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public sealed class UsersDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     public UsersDbContext(DbContextOptions<UsersDbContext> options)
     : base(options){}

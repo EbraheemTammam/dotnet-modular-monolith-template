@@ -7,6 +7,9 @@ using Base.Interfaces;
 using Users.Models;
 using Users.Data;
 using Users.Commands;
+using Users.Interfaces;
+using Users.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Users.Utilities;
 
@@ -27,6 +30,10 @@ public class UsersModuleRegistrar : IModuleRegistrar
         .AddEntityFrameworkStores<UsersDbContext>()
         .AddDefaultTokenProviders();
 
+        services.AddScoped<HttpContextAccessor>();
+
         services.AddScoped<CreateSuperUserCommand>();
+
+        services.AddScoped<IUserService, UserService>();
     }
 }
