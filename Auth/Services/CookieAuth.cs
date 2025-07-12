@@ -7,7 +7,7 @@ using Auth.Interfaces;
 
 namespace Auth.Services;
 
-public class CookieAuthService : ICookieAuthService
+internal class CookieAuthService : ICookieAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
