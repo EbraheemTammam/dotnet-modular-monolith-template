@@ -13,11 +13,11 @@ public static class WebAppExtensions
         app.UseAuthorization();
         app.MapControllers();
         app.UseStaticFiles();
-        // if(app.Environment.IsDevelopment())
-        // {
-        //     app.UseSwagger();
-        //     app.UseSwaggerUI();
-        // }
+        if(app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
         app.Lifetime.ApplicationStarted.Register(async () => await app.LoadDefaultData());
     }
 

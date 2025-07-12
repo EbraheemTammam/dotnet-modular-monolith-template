@@ -11,7 +11,7 @@ public static class ServiceExtensions
         services.Configure<CookieSetting>(cookieSettingSection);
 
         services.AddEndpointsApiExplorer();
-        // services.AddSwaggerGen();
+        services.AddSwaggerGen();
         services.AddAuthentication();
         services.AddAuthorization();
         services.AddCorsConfiguration(configuration);
