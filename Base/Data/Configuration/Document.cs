@@ -5,7 +5,7 @@ using Base.Models;
 
 namespace Base.Data.Configuration;
 
-public class DocumentConfiguration : IEntityTypeConfiguration<Document>
+internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
     public void Configure(EntityTypeBuilder<Document> builder)
     {

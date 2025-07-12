@@ -7,10 +7,10 @@ using Users.Interfaces;
 
 namespace Users.Controllers;
 
-public class UserController : ApiBaseController
+public class UsersController : ApiBaseController
 {
     private readonly IUserService _userService;
-    public UserController(IUserService userService) =>
+    public UsersController(IUserService userService) =>
         _userService = userService;
 
     [HttpGet, Authorize(Roles = "superuser")]
