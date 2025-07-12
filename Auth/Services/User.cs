@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 
-using Base.Interfaces;
-using Base.Models;
 using Base.Responses;
 using Base.Utilities;
+using Base.Data;
 using Users.Services;
 using Users.Models;
 using Users.DTOs;
+using Users.Data;
 using Auth.Interfaces;
 
 namespace Auth.Services;
@@ -20,10 +20,11 @@ internal class ExtendedUserService : UserService, IExtendedUserService
         UserManager<User> userManager,
         IHostEnvironment env,
         HttpContextAccessor httpContextAccessor,
-        IRepository<Document> documentObjects,
-        ICurrentLoggedInUser currentUser
+        ICurrentLoggedInUser currentUser,
+        VerificationRepository verificationObjects,
+        BaseDbContext baseDbContext
     )
-        : base(userManager, env, httpContextAccessor, documentObjects)
+        : base(userManager, env, httpContextAccessor, verificationObjects, baseDbContext)
     {
         _currentUser = currentUser;
     }

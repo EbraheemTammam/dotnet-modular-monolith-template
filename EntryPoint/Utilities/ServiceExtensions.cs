@@ -1,3 +1,5 @@
+using StackExchange.Redis;
+
 using Base.Interfaces;
 using Auth.Utilities;
 
@@ -18,6 +20,7 @@ public static class ServiceExtensions
         services.AddIISIntegrationConfiguration();
         services.AddControllers();
         services.AddHttpContextAccessor();
+        services.AddRedisConfiguration(configuration);
 
         return services;
     }
@@ -77,4 +80,11 @@ public static class ServiceExtensions
 
     public static IServiceCollection AddIISIntegrationConfiguration(this IServiceCollection services) =>
         services.Configure<IISOptions>(options => { });
+
+    public static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+        services.AddSingleton<IConnectionMultiplexer>(opt =>
+        {
+            var connection = configuration.GetConnectionString("Redis");
+            return ConnectionMultiplexer.Connect(connection!);
+        });
 }

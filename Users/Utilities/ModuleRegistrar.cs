@@ -34,6 +34,8 @@ public class UsersModuleRegistrar : IModuleRegistrar
 
         services.AddScoped<CreateSuperUserCommand>();
 
+        services.AddScoped<VerificationRepository>();
+
         services.AddScoped<IUserService, UserService>();
     }
 }

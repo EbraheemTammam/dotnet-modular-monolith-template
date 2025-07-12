@@ -6,7 +6,6 @@ namespace Base.Commands;
 public class StartAppCommand
 {
     private readonly string _contextContent;
-    private readonly string _repositoryContent;
     private readonly string _moduleRegistrarContent;
 
     public StartAppCommand()
@@ -26,16 +25,6 @@ public sealed class {0}DbContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof({0}DbContext).Assembly);
     }
-}";
-        _repositoryContent = @"using Base.Repositories;
-using Base.Models;
-using {0}.Data;
-
-namespace {0}.Repositories;
-
-public class {0}Repository<TModel> : GenericRepository<{0}DbContext, TModel> where TModel : BaseModel
-{
-    public {0}Repository({0}DbContext context) : base(context) {}
 }";
 
         _moduleRegistrarContent = @"using Microsoft.Extensions.Configuration;
@@ -158,10 +147,6 @@ public class {0}ModuleRegistrar : IModuleRegistrar
             string contextFilePath = Path.Combine(dataDir, $"{appName}DbContext.cs");
             File.WriteAllText(contextFilePath, _contextContent.Replace("{0}", appName));
             Console.WriteLine($"Created file: {contextFilePath}");
-
-            string repositoryFilePath = Path.Combine(dataDir, $"{appName}Repository.cs");
-            File.WriteAllText(repositoryFilePath, _repositoryContent.Replace("{0}", appName));
-            Console.WriteLine($"Created file: {repositoryFilePath}");
 
             string utilitiesDir = Path.Combine(basePath, appName, "Utilities");
             Directory.CreateDirectory(utilitiesDir);

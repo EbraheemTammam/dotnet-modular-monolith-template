@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 using Base.Interfaces;
 using Base.Commands;
-using Base.Models;
-using Base.Repositories;
 using Base.Data;
 
 namespace Base.Utilities;
@@ -18,7 +16,5 @@ public class BaseModuleRegistrar : IModuleRegistrar
 
         services.AddScoped<MakeMigrationsCommand>();
         services.AddScoped<StartAppCommand>();
-
-        services.AddScoped<IRepository<Document>, GenericRepository<BaseDbContext, Document>>();
     }
 }
