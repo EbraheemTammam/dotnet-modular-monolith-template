@@ -22,29 +22,6 @@ namespace Users.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Base.Models.Document", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Domain")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SaveTo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Document");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -233,9 +210,6 @@ namespace Users.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("ProfilePictureId")
-                        .IsUnique();
-
                     b.ToTable("Users", (string)null);
                 });
 
@@ -279,15 +253,6 @@ namespace Users.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Users.Models.User", b =>
-                {
-                    b.HasOne("Base.Models.Document", "ProfilePicture")
-                        .WithOne()
-                        .HasForeignKey("Users.Models.User", "ProfilePictureId");
-
-                    b.Navigation("ProfilePicture");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,8 +10,6 @@ public static class ServiceExtensions
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddAuthentication();
-        services.AddAuthorization();
         services.AddCorsConfiguration();
         services.AddIISIntegrationConfiguration();
         services.AddControllers();

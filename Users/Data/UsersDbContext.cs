@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+using Base.Models;
 using Users.Models;
 
 namespace Users.Data;
@@ -18,6 +19,8 @@ internal sealed class UsersDbContext : IdentityDbContext<User, IdentityRole<Guid
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(UsersDbContext).Assembly);
 
         modelBuilder.Ignore<IdentityUserLogin<Guid>>();
+
+        modelBuilder.Ignore<Document>();
 
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");

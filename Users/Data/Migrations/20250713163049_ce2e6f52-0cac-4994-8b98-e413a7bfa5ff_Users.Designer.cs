@@ -12,8 +12,8 @@ using Users.Data;
 namespace Users.Data.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    [Migration("20250711190805_UserModel")]
-    partial class UserModel
+    [Migration("20250713163049_ce2e6f52-0cac-4994-8b98-e413a7bfa5ff_Users")]
+    partial class ce2e6f520cac49948b98e413a7bfa5ff_Users
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,29 +24,6 @@ namespace Users.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Base.Models.Document", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Domain")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SaveTo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Document");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -236,9 +213,6 @@ namespace Users.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("ProfilePictureId")
-                        .IsUnique();
-
                     b.ToTable("Users", (string)null);
                 });
 
@@ -282,15 +256,6 @@ namespace Users.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Users.Models.User", b =>
-                {
-                    b.HasOne("Base.Models.Document", "ProfilePicture")
-                        .WithOne()
-                        .HasForeignKey("Users.Models.User", "ProfilePictureId");
-
-                    b.Navigation("ProfilePicture");
                 });
 #pragma warning restore 612, 618
         }

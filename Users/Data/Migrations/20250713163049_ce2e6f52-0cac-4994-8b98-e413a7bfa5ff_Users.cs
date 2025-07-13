@@ -7,25 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Users.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UserModel : Migration
+    public partial class ce2e6f520cac49948b98e413a7bfa5ff_Users : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Document",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FileName = table.Column<string>(type: "text", nullable: false),
-                    SaveTo = table.Column<string>(type: "text", nullable: false),
-                    Domain = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Document", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
@@ -67,11 +53,6 @@ namespace Users.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Document_ProfilePictureId",
-                        column: x => x.ProfilePictureId,
-                        principalTable: "Document",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -187,12 +168,6 @@ namespace Users.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_ProfilePictureId",
-                table: "Users",
-                column: "ProfilePictureId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "Users",
                 column: "NormalizedUserName",
@@ -219,9 +194,6 @@ namespace Users.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Document");
         }
     }
 }
