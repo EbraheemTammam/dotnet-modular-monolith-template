@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,10 +14,10 @@ namespace Users.Utilities;
 
 public class UsersModuleRegistrar : IModuleRegistrar
 {
-    public void Register(IServiceCollection services, IConfiguration configuration)
+    public void Register(IServiceCollection services)
     {
         services.AddDbContextPool<UsersDbContext>(
-            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+            options => options.UseNpgsql(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING"))
         );
 
         services.AddIdentity<User, IdentityRole<Guid>>(options =>

@@ -6,11 +6,11 @@ namespace Users.DTOs;
 
 public record UserAddDTO
 {
-    [Required, EmailAddress, MaxLength(150)] public required string Email { get; init; }
-    [Required, MaxLength(100)] public required string Password { get; init; }
     [Required, MaxLength(20)] public required string FirstName { get; init; }
     [Required, MaxLength(20)] public required string LastName { get; init; }
-    [Required, MaxLength(13)] public required string PhoneNumber { get; init; }
+    [Required, EmailAddress, MaxLength(150)] public required string Email { get; init; }
+    [Required, Phone, MaxLength(13)] public required string PhoneNumber { get; init; }
+    [Required, MaxLength(100)] public required string Password { get; init; }
     public IFormFile? ProfilePicture { get; init; }
     public User ToModel() =>
         new User

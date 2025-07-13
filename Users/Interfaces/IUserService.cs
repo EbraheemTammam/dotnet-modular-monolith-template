@@ -10,7 +10,7 @@ public interface IUserService
     Task<Response<UserDTO>> AddUser(UserAddDTO userCreateDTO);
     Task<Response> SendEmailVerification(string email);
     Task<Response> SendPhoneNumberVerification(string phoneNumber);
-    Task<Response> VerifyEmail(string token);
-    Task<Response> VerifyPhoneNumber(string token);
+    Task<Response> VerifyEmail(string email, string token);
+    Task<Response> VerifyPhoneNumber(string phoneNumber, string token);
     Task<Response> DeleteUser(Guid id);
 }

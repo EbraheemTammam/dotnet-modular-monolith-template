@@ -1,34 +1,29 @@
 using StackExchange.Redis;
 
 using Base.Interfaces;
-using Auth.Utilities;
 
 namespace EntryPoint.Utilities;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection Configure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection Configure(this IServiceCollection services)
     {
-        var cookieSettingSection = configuration.GetSection("CookieSetting");
-        services.Configure<CookieSetting>(cookieSettingSection);
-
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddAuthentication();
         services.AddAuthorization();
-        services.AddCorsConfiguration(configuration);
+        services.AddCorsConfiguration();
         services.AddIISIntegrationConfiguration();
         services.AddControllers();
         services.AddHttpContextAccessor();
-        services.AddRedisConfiguration(configuration);
+        services.AddRedisConfiguration();
 
         return services;
     }
 
-    public static void RegisterModules(this IServiceCollection services, IConfiguration configuration, string[] modules)
+    public static void RegisterModules(this IServiceCollection services, string[] modules)
     {
         ArgumentNullException.ThrowIfNull(services, nameof(services));
-        ArgumentNullException.ThrowIfNull(configuration, nameof(configuration));
         ArgumentNullException.ThrowIfNull(modules, nameof(modules));
 
         foreach (string module in modules)
@@ -51,7 +46,7 @@ public static class ServiceExtensions
                     continue;
                 }
 
-                registrar.Register(services, configuration);
+                registrar.Register(services);
                 Console.WriteLine($"Module {module} registered successfully.");
             }
             catch (Exception ex)
@@ -65,12 +60,12 @@ public static class ServiceExtensions
         }
     }
 
-    public static IServiceCollection AddCorsConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+    public static IServiceCollection AddCorsConfiguration(this IServiceCollection services) =>
         services.AddCors(options =>
             {
                 options.AddPolicy(
                     "CorsPolicy",
-                    builder => builder.WithOrigins(configuration.GetSection("CookieSetting").Get<CookieSetting>()!.AllowedOrigins!)
+                    builder => builder.WithOrigins(Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")!.Split(","))
                                       .AllowCredentials()
                                       .AllowAnyMethod()
                                       .AllowAnyHeader()
@@ -81,10 +76,10 @@ public static class ServiceExtensions
     public static IServiceCollection AddIISIntegrationConfiguration(this IServiceCollection services) =>
         services.Configure<IISOptions>(options => { });
 
-    public static IServiceCollection AddRedisConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+    public static IServiceCollection AddRedisConfiguration(this IServiceCollection services) =>
         services.AddSingleton<IConnectionMultiplexer>(opt =>
         {
-            var connection = configuration.GetConnectionString("Redis");
+            var connection = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
             return ConnectionMultiplexer.Connect(connection!);
         });
 }

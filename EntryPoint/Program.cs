@@ -1,5 +1,6 @@
 using System.CommandLine;
 using DotNetEnv;
+using Twilio;
 
 using Base.Commands;
 using Users.Commands;
@@ -12,8 +13,13 @@ builder.Configuration.AddEnvironmentVariables();
 
 string[] modules = ["Base", "Users", "Auth"];
 
-builder.Services.RegisterModules(builder.Configuration, modules);
-builder.Services.Configure(builder.Configuration);
+builder.Services.RegisterModules(modules);
+builder.Services.Configure();
+
+TwilioClient.Init(
+    Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID"),
+    Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN")
+);
 
 var app = builder.Build();
 

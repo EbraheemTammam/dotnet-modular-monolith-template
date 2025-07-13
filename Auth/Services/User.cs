@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 using Base.Responses;
 using Base.Utilities;
+using Base.Interfaces;
 using Base.Data;
 using Users.Services;
 using Users.Models;
@@ -22,9 +23,10 @@ internal class ExtendedUserService : UserService, IExtendedUserService
         HttpContextAccessor httpContextAccessor,
         ICurrentLoggedInUser currentUser,
         VerificationRepository verificationObjects,
-        BaseDbContext baseDbContext
+        BaseDbContext baseDbContext,
+        INotificationService notificationService
     )
-        : base(userManager, env, httpContextAccessor, verificationObjects, baseDbContext)
+        : base(userManager, env, httpContextAccessor, verificationObjects, baseDbContext, notificationService)
     {
         _currentUser = currentUser;
     }

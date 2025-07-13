@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +10,9 @@ namespace Auth.Utilities;
 
 public class AuthModuleRegistrar : IModuleRegistrar
 {
-    public void Register(IServiceCollection services, IConfiguration configuration)
+    public void Register(IServiceCollection services)
     {
-        services.AddDbContextPool<AuthDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContextPool<AuthDbContext>(options => options.UseNpgsql(Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING")));
 
         services.AddScoped<ICookieAuthService, CookieAuthService>();
         services.AddScoped<ICurrentLoggedInUser, CurrentLoggedInUser>();
