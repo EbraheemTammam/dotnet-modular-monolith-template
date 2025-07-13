@@ -30,7 +30,7 @@ public record Response
     }
     public static Response Success(int statusCode = 200) => new(statusCode, true);
     public static Response Fail(string? message = null, int statusCode = 400) => new(statusCode, false, message);
-    public static Response NotFound(Guid id, string resource, string idField = "id") =>
+    public static Response NotFound(string id, string resource, string idField = "id") =>
         new(404, false, $"{resource} with {idField} {id} Not Found");
     public static Response BadRequest(string message) => new(400, false, message);
     public static Response InternalServerError = new(500, false, "Something went wrong");
@@ -48,7 +48,7 @@ public sealed record Response<TData> : Response
     }
     public static Response<TData> Success(TData data, int statusCode = 200) => new(statusCode, data, true);
     public static new Response<TData> Fail(string? message = null, int statusCode = 400) => new(statusCode, default, false, message);
-    public static new Response<TData> NotFound(Guid id, string resource, string idField = "id") =>
+    public static new Response<TData> NotFound(string id, string resource, string idField = "id") =>
         new(404, default, false, $"{resource} with {idField} {id} Not Found");
     public static new Response<TData> BadRequest(string message) => new(400, default, false, message);
     public static new Response<TData> InternalServerError = new(500, default, false, "Something went wrong");
