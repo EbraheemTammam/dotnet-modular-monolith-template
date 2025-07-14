@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -21,26 +20,6 @@ public class UsersController : ApiBaseController
     [HttpGet("{id}"), Authorize(Roles = "superuser")]
     public async Task<ActionResult<UserDTO>> GetUser(Guid id) =>
         HandleResult(await _userService.GetUser(id));
-
-    [HttpPost]
-    public async Task<ActionResult<UserDTO>> AddUser([FromForm] UserAddDTO userAddDTO) =>
-        HandleResult(await _userService.AddUser(userAddDTO));
-
-    [HttpPost("send_email_verification")]
-    public async Task<ActionResult> SendEmailVerification([Required, EmailAddress] string email) =>
-        HandleResult(await _userService.SendEmailVerification(email));
-
-    [HttpPost("send_phone_number_verification")]
-    public async Task<ActionResult> SendPhoneNumberVerification([Required, Phone] string phoneNumber) =>
-        HandleResult(await _userService.SendPhoneNumberVerification(phoneNumber));
-
-    [HttpPost("verify_email")]
-    public async Task<ActionResult> VerifyEmail([Required, EmailAddress] string email, [Required] string token) =>
-        HandleResult(await _userService.VerifyEmail(email, token));
-
-    [HttpPost("verify_phone_number")]
-    public async Task<ActionResult> VerifyPhoneNumber([Required, Phone] string phoneNumber, [Required] string token) =>
-        HandleResult(await _userService.VerifyPhoneNumber(phoneNumber, token));
 
     [HttpDelete("{id}"), Authorize(Roles = "superuser")]
     public async Task<ActionResult> DeleteUser(Guid id) =>

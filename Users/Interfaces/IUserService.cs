@@ -7,10 +7,5 @@ public interface IUserService
 {
     Response<IEnumerable<UserDTO>> GetAllUsers();
     Task<Response<UserDTO>> GetUser(Guid id);
-    Task<Response<UserDTO>> AddUser(UserAddDTO userCreateDTO);
-    Task<Response> SendEmailVerification(string email);
-    Task<Response> SendPhoneNumberVerification(string phoneNumber);
-    Task<Response> VerifyEmail(string email, string token);
-    Task<Response> VerifyPhoneNumber(string phoneNumber, string token);
     Task<Response> DeleteUser(Guid id);
 }
