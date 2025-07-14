@@ -8,7 +8,7 @@ using Base.Services;
 
 namespace Base.Utilities;
 
-public class BaseModuleRegistrar : IModuleRegistrar
+internal class BaseModuleRegistrar : IModuleRegistrar
 {
     public void Register(IServiceCollection services)
     {

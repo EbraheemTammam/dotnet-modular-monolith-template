@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 
 using Base.Interfaces;
 using Users.Models;
@@ -8,11 +9,10 @@ using Users.Data;
 using Users.Commands;
 using Users.Interfaces;
 using Users.Services;
-using Microsoft.AspNetCore.Http;
 
 namespace Users.Utilities;
 
-public class UsersModuleRegistrar : IModuleRegistrar
+internal class UsersModuleRegistrar : IModuleRegistrar
 {
     public void Register(IServiceCollection services)
     {

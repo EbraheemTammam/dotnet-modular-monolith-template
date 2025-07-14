@@ -3,15 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 
 using Base.Interfaces;
+using Users.Models;
 using Auth.Interfaces;
 using Auth.Services;
 using Auth.Data;
 
 namespace Auth.Utilities;
 
-public class AuthModuleRegistrar : IModuleRegistrar
+internal class AuthModuleRegistrar : IModuleRegistrar
 {
     public void Register(IServiceCollection services)
     {
@@ -36,10 +38,12 @@ public class AuthModuleRegistrar : IModuleRegistrar
                 });
         services.AddAuthorization();
 
-        services.AddScoped<ICookieAuthService, CookieAuthService>();
-        services.AddScoped<IJWTAuthService, TokenService>();
+        services.AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
         services.AddScoped<ICurrentLoggedInUser, CurrentLoggedInUser>();
 
+        services.AddScoped<ICookieAuthService, CookieAuthService>();
+        services.AddScoped<IJWTAuthService, TokenService>();
         services.AddScoped<IExtendedUserService, ExtendedUserService>();
+
     }
 }

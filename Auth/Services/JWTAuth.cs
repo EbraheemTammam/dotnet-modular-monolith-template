@@ -11,6 +11,7 @@ using Auth.DTOs;
 using Auth.Interfaces;
 using Auth.Data;
 using Auth.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Services;
 
@@ -33,6 +34,7 @@ public class TokenService : IJWTAuthService
         if (!passwordVerified) return Response<LoginResponseDTO>.UnAuthorized;
         var token = await GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
+        await RefreshTokenUpdateOrCreate(refreshToken, user.Id);
         return Response<LoginResponseDTO>.Success(new LoginResponseDTO
         {
             AccessToken = token,
@@ -112,6 +114,33 @@ public class TokenService : IJWTAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    private async Task RefreshTokenUpdateOrCreate(string refreshTokenText, Guid userId)
+    {
+        RefreshToken? refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId);
+        if (refreshToken is null)
+        {
+            refreshToken = new RefreshToken
+            {
+                Token = refreshTokenText,
+                ExpiresAt = DateTime.UtcNow.AddDays(
+                    double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
+                ),
+                UserId = userId
+            };
+            await _context.RefreshTokens.AddAsync(refreshToken);
+        }
+        else
+        {
+            refreshToken.Token = refreshTokenText;
+            refreshToken.ExpiresAt = DateTime.UtcNow.AddDays(
+                double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
+            );
+            refreshToken.IsRevoked = false;
+            _context.RefreshTokens.Update(refreshToken);
+        }
+        await _context.SaveChangesAsync();
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
