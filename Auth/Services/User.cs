@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +44,7 @@ internal class ExtendedUserService : UserService, IExtendedUserService
         _baseDbContext = baseDbContext;
     }
 
-    public async Task<Response<UserDTO>> Register(UserAddDTO userAddDTO)
+    public async Task<Response<UserDTO>> Register(UserAddDTO userAddDTO, IUrlHelper Url)
     {
         User user = userAddDTO.ToModel();
         if (userAddDTO.ProfilePicture is not null)
@@ -59,34 +61,41 @@ internal class ExtendedUserService : UserService, IExtendedUserService
             user.ProfilePictureId = profilePicture.Id;
         }
         await _userManager.CreateAsync(user, userAddDTO.Password);
+
+        string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        string? confirmationLink = Url.Action(
+            nameof(ConfirmEmail),
+            "Auth",
+            new { userId = user.Id, token },
+            _request.Scheme
+        );
+
+        string emailBody = $"Please confirm your email by clicking <a href='{HtmlEncoder.Default.Encode(confirmationLink!)}'>here</a>.";
+        await _notificationService.SendEmail(userAddDTO.Email, "Confirm Your Email", emailBody);
+
+        var code = new Random().Next(100000, 999999).ToString();
+        var verification = new Verification
+        {
+            PhoneNumber = userAddDTO.PhoneNumber,
+            Token = code
+        };
+        await _verificationObjects.AddVerificationAsync(verification);
+        await _notificationService.SendSms(userAddDTO.PhoneNumber, $"Your verification code is {code}");
+
         return Response<UserDTO>.Success(UserDTO.FromModel(user, _request));
     }
 
-    public Task<Response> SendEmailVerification(string email)
+    public async Task<Response> ConfirmEmail(string userId, string token)
     {
-        throw new NotImplementedException();
-    }
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null) return Response.NotFound(userId, nameof(User));
 
-    public async Task<Response> SendPhoneNumberVerification(string phoneNumber)
-    {
-        User? user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
-        if (user is not null)
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        return result.Succeeded switch
         {
-            var code = new Random().Next(100000, 999999).ToString();
-            var verification = new Verification
-            {
-                PhoneNumber = phoneNumber,
-                Token = code
-            };
-            await _verificationObjects.AddVerificationAsync(verification);
-            await _notificationService.SendSms(phoneNumber, $"Your verification code is {code}");
-        }
-        return Response.Success();
-    }
-
-    public Task<Response> VerifyEmail(string email, string token)
-    {
-        throw new NotImplementedException();
+            true => Response.Success(),
+            false => Response.Fail(result.Errors.First().Description)
+        };
     }
 
     public async Task<Response> VerifyPhoneNumber(string phoneNumber, string token)

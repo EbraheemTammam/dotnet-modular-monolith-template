@@ -33,25 +33,17 @@ public class AuthController : ApiBaseController
 
     [HttpPost("register")]
     public async Task<ActionResult<UserDTO>> Register([FromForm] UserAddDTO userAddDTO) =>
-        HandleResult(await _userService.Register(userAddDTO));
+        HandleResult(await _userService.Register(userAddDTO, Url));
 
-    [HttpPost("send_email_verification")]
-    public async Task<ActionResult> SendEmailVerification([Required, EmailAddress] string email) =>
-        HandleResult(await _userService.SendEmailVerification(email));
+    [HttpPost("confirm-email")]
+    public async Task<ActionResult> ConfirmEmail([Required, EmailAddress] string email, [Required] string token) =>
+        HandleResult(await _userService.ConfirmEmail(email, token));
 
-    [HttpPost("send_phone_number_verification")]
-    public async Task<ActionResult> SendPhoneNumberVerification([Required, Phone] string phoneNumber) =>
-        HandleResult(await _userService.SendPhoneNumberVerification(phoneNumber));
-
-    [HttpPost("verify_email")]
-    public async Task<ActionResult> VerifyEmail([Required, EmailAddress] string email, [Required] string token) =>
-        HandleResult(await _userService.VerifyEmail(email, token));
-
-    [HttpPost("verify_phone_number")]
+    [HttpPost("verify-phone-number")]
     public async Task<ActionResult> VerifyPhoneNumber([Required, Phone] string phoneNumber, [Required] string token) =>
         HandleResult(await _userService.VerifyPhoneNumber(phoneNumber, token));
 
-    [HttpPut("change_password"), Authorize]
+    [HttpPut("change-password"), Authorize]
     public async Task<ActionResult> ChangePassword(UserUpdatePasswordDTO userUpdatePasswordDTO) =>
         HandleResult(await _userService.UpdatePassword(userUpdatePasswordDTO));
 }

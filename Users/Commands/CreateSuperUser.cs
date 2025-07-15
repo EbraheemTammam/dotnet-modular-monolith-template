@@ -82,7 +82,8 @@ public class CreateSuperUserCommand
                 LastName = lastName,
                 Email = email,
                 UserName = email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
             };
 
             var result = await _userManager.CreateAsync(user, password);

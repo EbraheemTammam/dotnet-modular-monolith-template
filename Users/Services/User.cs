@@ -27,9 +27,11 @@ public class UserService : IUserService
     public async Task<Response<UserDTO>> GetUser(Guid id)
     {
         User? user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
-        if (user is null)
-            return Response<UserDTO>.NotFound(id.ToString(), nameof(User));
-        return Response<UserDTO>.Success(UserDTO.FromModel(user, _request));
+        return user switch
+        {
+            null => Response<UserDTO>.NotFound(id.ToString(), nameof(User)),
+            _ => Response<UserDTO>.Success(UserDTO.FromModel(user, _request))
+        };
     }
 
     public async Task<Response> DeleteUser(Guid id)

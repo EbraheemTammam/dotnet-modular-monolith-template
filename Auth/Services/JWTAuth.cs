@@ -29,7 +29,7 @@ public class TokenService : IJWTAuthService
     public async Task<Response<LoginResponseDTO>> LoginAsync(LoginDTO loginDTO)
     {
         User? user = _userManager.FindByEmailAsync(loginDTO.Email).Result;
-        if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
+        if (user is null or not { PhoneNumberConfirmed: true }) return Response<LoginResponseDTO>.UnAuthorized;
         bool passwordVerified = await _userManager.CheckPasswordAsync(user, loginDTO.Password);
         if (!passwordVerified) return Response<LoginResponseDTO>.UnAuthorized;
         var token = await GenerateAccessToken(user);
