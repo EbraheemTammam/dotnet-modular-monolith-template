@@ -27,8 +27,7 @@ public sealed class {0}DbContext : DbContext
     }
 }";
 
-        _moduleRegistrarContent = @"using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+        _moduleRegistrarContent = @"using Microsoft.Extensions.DependencyInjection;
 
 using Base.Interfaces;
 
@@ -36,7 +35,7 @@ namespace {0}.Utilities;
 
 public class {0}ModuleRegistrar : IModuleRegistrar
 {
-    public void Register(IServiceCollection services, IConfiguration configuration)
+    public void Register(IServiceCollection services)
     {
 
     }
@@ -144,14 +143,14 @@ public class {0}ModuleRegistrar : IModuleRegistrar
             Directory.CreateDirectory(dataDir);
             Directory.CreateDirectory(Path.Combine(dataDir, "Configuration"));
 
-            string contextFilePath = Path.Combine(dataDir, $"{appName}DbContext.cs");
+            string contextFilePath = Path.Combine(dataDir, $"DbContext.cs");
             File.WriteAllText(contextFilePath, _contextContent.Replace("{0}", appName));
             Console.WriteLine($"Created file: {contextFilePath}");
 
             string utilitiesDir = Path.Combine(basePath, appName, "Utilities");
             Directory.CreateDirectory(utilitiesDir);
 
-            string moduleRegistrarFilePath = Path.Combine(utilitiesDir, $"{appName}ModuleRegistrar.cs");
+            string moduleRegistrarFilePath = Path.Combine(utilitiesDir, $"ModuleRegistrar.cs");
             File.WriteAllText(moduleRegistrarFilePath, _moduleRegistrarContent.Replace("{0}", appName));
             Console.WriteLine($"Created file: {moduleRegistrarFilePath}");
 

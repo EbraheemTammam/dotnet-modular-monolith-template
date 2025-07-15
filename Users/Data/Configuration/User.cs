@@ -17,5 +17,8 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.ProfilePicture)
                .WithOne()
                .HasForeignKey<User>(u => u.ProfilePictureId);
+
+        builder.HasIndex(u => u.Email);
+        builder.HasIndex(u => u.PhoneNumber);
     }
 }

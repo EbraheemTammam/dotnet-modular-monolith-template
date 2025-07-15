@@ -12,5 +12,7 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(d => d.FileName).HasMaxLength(100);
         builder.Property(d => d.SaveTo).HasMaxLength(100);
         builder.Property(d => d.Domain).HasMaxLength(100);
+
+        builder.HasIndex(d => d.FileName);
     }
 }
