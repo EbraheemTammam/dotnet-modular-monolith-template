@@ -33,7 +33,7 @@ using Base.Interfaces;
 
 namespace {0}.Utilities;
 
-public class {0}ModuleRegistrar : IModuleRegistrar
+internal class {0}ModuleRegistrar : IModuleRegistrar
 {
     public void Register(IServiceCollection services)
     {
