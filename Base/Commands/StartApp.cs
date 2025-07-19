@@ -37,7 +37,7 @@ public class {0}ModuleRegistrar : IModuleRegistrar
 {
     public void Register(IServiceCollection services)
     {
-
+        services.AddDbContextPool<{0}DbContext>(options => options.UseNpgsql(Environment.GetEnvironmentVariable(""POSTGRES_CONNECTION_STRING"")));
     }
 }";
     }
@@ -74,11 +74,8 @@ public class {0}ModuleRegistrar : IModuleRegistrar
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
-                Console.WriteLine("Output (dotnet new classlib):");
-                Console.WriteLine(output);
                 if (!string.IsNullOrEmpty(error))
                 {
-                    Console.WriteLine("Errors (dotnet new classlib):");
                     Console.WriteLine(error);
                 }
             }
@@ -101,11 +98,32 @@ public class {0}ModuleRegistrar : IModuleRegistrar
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
-                Console.WriteLine("Output (dotnet new classlib):");
-                Console.WriteLine(output);
                 if (!string.IsNullOrEmpty(error))
                 {
-                    Console.WriteLine("Errors (dotnet new classlib):");
+                    Console.WriteLine(error);
+                }
+            }
+
+            processInfo = new ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"add EntryPoint reference {appName}",
+                WorkingDirectory = basePath,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = new Process { StartInfo = processInfo })
+            {
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                if (!string.IsNullOrEmpty(error))
+                {
                     Console.WriteLine(error);
                 }
             }
@@ -128,11 +146,8 @@ public class {0}ModuleRegistrar : IModuleRegistrar
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
-                Console.WriteLine("Output (dotnet new classlib):");
-                Console.WriteLine(output);
                 if (!string.IsNullOrEmpty(error))
                 {
-                    Console.WriteLine("Errors (dotnet new classlib):");
                     Console.WriteLine(error);
                 }
             }
