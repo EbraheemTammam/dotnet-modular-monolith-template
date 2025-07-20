@@ -19,9 +19,7 @@ namespace Accounts.Services;
 
 public class UserService : IUserService
 {
-    protected readonly HttpRequest _request;
     protected readonly UserManager<User> _userManager;
-    private readonly ICurrentLoggedInUser _currentUser;
     private readonly IHostEnvironment _env;
     private readonly INotificationService _notificationService;
     private readonly VerificationRepository _verificationObjects;
@@ -29,28 +27,24 @@ public class UserService : IUserService
     public UserService(
         UserManager<User> userManager,
         IHostEnvironment env,
-        HttpContextAccessor httpContextAccessor,
-        ICurrentLoggedInUser currentUser,
         VerificationRepository verificationObjects,
         BaseDbContext baseDbContext,
         INotificationService notificationService
     )
     {
-        _request = httpContextAccessor.HttpContext!.Request;
         _userManager = userManager;
-        _currentUser = currentUser;
         _env = env;
         _notificationService = notificationService;
         _verificationObjects = verificationObjects;
         _baseDbContext = baseDbContext;
     }
 
-    public Response<IEnumerable<UserDTO>> GetAllUsers() =>
+    public Response<IEnumerable<UserDTO>> GetAllUsers(HttpRequest request) =>
         Response<IEnumerable<UserDTO>>.Success(
-            _userManager.Users.Select(u => UserDTO.FromModel(u, _request))
+            _userManager.Users.Select(u => UserDTO.FromModel(u, request))
         );
 
-    public async Task<Response<UserDTO>> GetUser(string searchField, string searchValue)
+    public async Task<Response<UserDTO>> GetUser(HttpRequest request, string searchField, string searchValue)
     {
         searchField = searchField.ToLower();
         User? user = (
@@ -62,7 +56,7 @@ public class UserService : IUserService
         return user switch
         {
             null => Response<UserDTO>.NotFound(searchValue, nameof(User), searchField),
-            _ => Response<UserDTO>.Success(UserDTO.FromModel(user, _request))
+            _ => Response<UserDTO>.Success(UserDTO.FromModel(user, request))
         };
     }
 
@@ -75,7 +69,7 @@ public class UserService : IUserService
         return Response.Success();
     }
 
-    public async Task<Response<UserDTO>> Register(UserAddDTO userAddDTO, IUrlHelper Url)
+    public async Task<Response<UserDTO>> Register(HttpRequest request, UserAddDTO userAddDTO, IUrlHelper Url)
     {
         User user = userAddDTO.ToModel();
         if (userAddDTO.ProfilePicture is not null)
@@ -99,7 +93,7 @@ public class UserService : IUserService
             nameof(ConfirmEmail),
             "Auth",
             new { userId = user.Id, token },
-            _request.Scheme
+            request.Scheme
         );
 
         string emailBody = $"Please confirm your email by clicking <a href='{HtmlEncoder.Default.Encode(confirmationLink!)}'>here</a>.";
@@ -114,7 +108,7 @@ public class UserService : IUserService
         await _verificationObjects.AddVerificationAsync(verification);
         await _notificationService.SendSms(userAddDTO.PhoneNumber, $"Your verification code is {code}");
 
-        return Response<UserDTO>.Success(UserDTO.FromModel(user, _request));
+        return Response<UserDTO>.Success(UserDTO.FromModel(user, request));
     }
 
     public async Task<Response> ConfirmEmail(string userId, string token)
@@ -141,20 +135,22 @@ public class UserService : IUserService
         return Response.Success();
     }
 
-    public async Task<Response<UserDTO>> PartialUpdateUser(UserPartialUpdateDTO userPartialUpdateDTO)
+    public async Task<Response<UserDTO>> PartialUpdateUser(HttpRequest request, string userId, UserPartialUpdateDTO userPartialUpdateDTO)
     {
-        User? user = await _currentUser.GetUser();
+        User? user = await _userManager.FindByIdAsync(userId);
+        if (user is null) return Response<UserDTO>.NotFound(userId, nameof(User));
         user.FirstName = userPartialUpdateDTO.FirstName ?? user.FirstName;
         user.LastName = userPartialUpdateDTO.LastName ?? user.LastName;
         await _userManager.UpdateAsync(user);
         if (userPartialUpdateDTO.ProfilePicture is not null)
             await userPartialUpdateDTO.ProfilePicture!.SaveAsWebP(user.Id.ToString(), $"{_env.ContentRootPath}/{user.ProfilePicture!.SaveTo}");
-        return Response<UserDTO>.Success(UserDTO.FromModel(user, _request));
+        return Response<UserDTO>.Success(UserDTO.FromModel(user, request));
     }
 
-    public async Task<Response> UpdatePassword(UserUpdatePasswordDTO userUpdatePasswordDTO)
+    public async Task<Response> UpdatePassword(string userId, UserUpdatePasswordDTO userUpdatePasswordDTO)
     {
-        User? user = await _currentUser.GetUser();
+        User? user = await _userManager.FindByIdAsync(userId);
+        if (user is null) return Response.NotFound(userId, nameof(User));
         await _userManager.ChangePasswordAsync(user, userUpdatePasswordDTO.CurrentPassword, userUpdatePasswordDTO.NewPassword);
         return Response.Success();
     }

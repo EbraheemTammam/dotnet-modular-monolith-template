@@ -13,7 +13,6 @@ public static class ServiceExtensions
         services.AddCorsConfiguration();
         services.AddIISIntegrationConfiguration();
         services.AddControllers();
-        services.AddHttpContextAccessor();
         services.AddRedisConfiguration();
 
         return services;

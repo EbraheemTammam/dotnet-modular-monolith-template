@@ -58,7 +58,6 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
         services.AddScoped<HttpContextAccessor>();
 
         services.AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
-        services.AddScoped<ICurrentLoggedInUser, CurrentLoggedInUser>();
 
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICookieAuthService, CookieAuthService>();

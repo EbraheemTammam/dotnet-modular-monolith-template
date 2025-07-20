@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -32,7 +33,7 @@ public class AuthController : ApiBaseController
 
     [HttpPost("register")]
     public async Task<ActionResult<UserDTO>> Register([FromForm] UserAddDTO userAddDTO) =>
-        HandleResult(await _userService.Register(userAddDTO, Url));
+        HandleResult(await _userService.Register(HttpContext.Request, userAddDTO, Url));
 
     [HttpPost("confirm-email")]
     public async Task<ActionResult> ConfirmEmail([Required, EmailAddress] string email, [Required] string token) =>
@@ -44,5 +45,8 @@ public class AuthController : ApiBaseController
 
     [HttpPut("change-password"), Authorize]
     public async Task<ActionResult> ChangePassword(UserUpdatePasswordDTO userUpdatePasswordDTO) =>
-        HandleResult(await _userService.UpdatePassword(userUpdatePasswordDTO));
+        HandleResult(await _userService.UpdatePassword(
+            HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!,
+            userUpdatePasswordDTO
+        ));
 }
