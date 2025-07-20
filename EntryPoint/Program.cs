@@ -3,7 +3,7 @@ using DotNetEnv;
 using Twilio;
 
 using Base.Commands;
-using Users.Commands;
+using Accounts.Commands;
 using EntryPoint.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 
-string[] modules = ["Base", "Users", "Auth"];
+string[] modules = ["Base", "Accounts"];
 
 builder.Services.RegisterModules(modules);
 builder.Services.Configure();
