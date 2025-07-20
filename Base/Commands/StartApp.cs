@@ -28,8 +28,10 @@ public sealed class {0}DbContext : DbContext
 }";
 
         _moduleRegistrarContent = @"using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 using Base.Interfaces;
+using {0}.Data;
 
 namespace {0}.Utilities;
 
