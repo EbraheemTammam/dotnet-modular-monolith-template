@@ -46,7 +46,7 @@ public class User : IdentityUser<Guid>
 
     public async Task SaveProfilePicture(IFormFile profilePicture, string rootPath)
     {
-        string dir = "users/profile_pictures";
+        string dir = "media/profile_pictures";
         if (!Directory.Exists(Path.Combine(rootPath, dir)))
             Directory.CreateDirectory(Path.Combine(rootPath, dir));
         await profilePicture.SaveAsWebP(Path.Combine(rootPath, dir, Id.ToString()));
