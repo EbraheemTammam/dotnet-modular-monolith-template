@@ -71,10 +71,12 @@ public class UserService : IUserService
     public async Task<Response<UserDTO>> Register(HttpRequest request, UserAddDTO userAddDTO, IUrlHelper Url)
     {
         User user = userAddDTO.ToModel();
+        var res = await _userManager.CreateAsync(user, userAddDTO.Password);
+        if (!res.Succeeded) return Response<UserDTO>.Fail(res.Errors.First().Description);
+        await _userManager.AddToRoleAsync(user, "user");
+
         if (userAddDTO.ProfilePicture is not null)
             await user.SaveProfilePicture(userAddDTO.ProfilePicture, _env.ContentRootPath);
-        await _userManager.CreateAsync(user, userAddDTO.Password);
-        await _userManager.AddToRoleAsync(user, "user");
 
         await user.SendEmailConfirmation(_userManager, request.Scheme, _notificationService, Url);
         await user.SendPhoneNumberConfirmation(_notificationService, _verifications);

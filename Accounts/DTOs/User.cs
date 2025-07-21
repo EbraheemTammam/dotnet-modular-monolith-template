@@ -17,6 +17,7 @@ public record UserAddDTO
         new User
         {
             Email = Email,
+            UserName = Email,
             FirstName = FirstName,
             LastName = LastName,
             PhoneNumber = PhoneNumber,
