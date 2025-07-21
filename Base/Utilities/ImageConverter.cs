@@ -6,7 +6,7 @@ namespace Base.Utilities;
 
 public static class ImageConverter
 {
-    public static async Task SaveAsWebP(this IFormFile img, string filenName, string saveTo, int quality = 50)
+    public static async Task SaveAsWebP(this IFormFile img, string filenName, int quality = 50)
     {
         try
         {
@@ -16,7 +16,7 @@ public static class ImageConverter
                 Quality = quality,
                 FileFormat = WebpFileFormatType.Lossless
             };
-            await image.SaveAsync(Path.Combine(saveTo, $"{filenName}.webp"), webpEncoder);
+            await image.SaveAsync($"{filenName}.webp", webpEncoder);
         }
         catch (Exception ex)
         {

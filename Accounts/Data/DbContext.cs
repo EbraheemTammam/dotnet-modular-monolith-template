@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
-using Base.Models;
 using Accounts.Models;
 
 namespace Accounts.Data;
@@ -21,8 +20,6 @@ public sealed class AccountsDbContext : IdentityDbContext<User, IdentityRole<Gui
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AccountsDbContext).Assembly);
 
         modelBuilder.Ignore<IdentityUserLogin<Guid>>();
-
-        modelBuilder.Ignore<Document>();
 
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");

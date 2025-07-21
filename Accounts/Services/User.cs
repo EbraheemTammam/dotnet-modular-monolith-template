@@ -1,4 +1,3 @@
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 
 using Base.Responses;
-using Base.Models;
 using Base.Data;
 using Base.Interfaces;
 using Base.Utilities;
@@ -22,12 +20,12 @@ public class UserService : IUserService
     protected readonly UserManager<User> _userManager;
     private readonly IHostEnvironment _env;
     private readonly INotificationService _notificationService;
-    private readonly VerificationRepository _verificationObjects;
+    private readonly VerificationManager _verifications;
     private readonly BaseDbContext _baseDbContext;
     public UserService(
         UserManager<User> userManager,
         IHostEnvironment env,
-        VerificationRepository verificationObjects,
+        VerificationManager verifications,
         BaseDbContext baseDbContext,
         INotificationService notificationService
     )
@@ -35,7 +33,7 @@ public class UserService : IUserService
         _userManager = userManager;
         _env = env;
         _notificationService = notificationService;
-        _verificationObjects = verificationObjects;
+        _verifications = verifications;
         _baseDbContext = baseDbContext;
     }
 
@@ -73,40 +71,12 @@ public class UserService : IUserService
     {
         User user = userAddDTO.ToModel();
         if (userAddDTO.ProfilePicture is not null)
-        {
-            Document profilePicture = new Document
-            {
-                FileName = $"{user.Id}.webp",
-                SaveTo = $"/users/profile_pictures",
-                Domain = _env.ContentRootPath
-            };
-            _baseDbContext.Documents.Add(profilePicture);
-            await _baseDbContext.SaveChangesAsync();
-            await userAddDTO.ProfilePicture.SaveAsWebP(user.Id.ToString(), $"{_env.ContentRootPath}/{user.ProfilePicture!.SaveTo}");
-            user.ProfilePictureId = profilePicture.Id;
-        }
+            await user.SaveProfilePicture(userAddDTO.ProfilePicture, _env.ContentRootPath);
         await _userManager.CreateAsync(user, userAddDTO.Password);
         await _userManager.AddToRoleAsync(user, "user");
 
-        string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        string? confirmationLink = Url.Action(
-            nameof(ConfirmEmail),
-            "Auth",
-            new { userId = user.Id, token },
-            request.Scheme
-        );
-
-        string emailBody = $"Please confirm your email by clicking <a href='{HtmlEncoder.Default.Encode(confirmationLink!)}'>here</a>.";
-        await _notificationService.SendEmail(userAddDTO.Email, "Confirm Your Email", emailBody);
-
-        var code = new Random().Next(100000, 999999).ToString();
-        var verification = new Verification
-        {
-            PhoneNumber = userAddDTO.PhoneNumber,
-            Token = code
-        };
-        await _verificationObjects.AddVerificationAsync(verification);
-        await _notificationService.SendSms(userAddDTO.PhoneNumber, $"Your verification code is {code}");
+        await user.SendEmailConfirmation(_userManager, request.Scheme, _notificationService, Url);
+        await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
 
         return Response<UserDTO>.Success(UserDTO.FromModel(user, request));
     }
@@ -127,7 +97,7 @@ public class UserService : IUserService
     public async Task<Response> VerifyPhoneNumber(string phoneNumber, string token)
     {
         User? user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
-        Verification? verification = await _verificationObjects.GetVerificationAsync(phoneNumber);
+        Verification? verification = await _verifications.GetAsync(phoneNumber);
         if (user is null || verification is null || verification.Token != token)
             return Response.Fail("Invalid verification code");
         user.PhoneNumberConfirmed = true;
@@ -143,7 +113,7 @@ public class UserService : IUserService
         user.LastName = userPartialUpdateDTO.LastName ?? user.LastName;
         await _userManager.UpdateAsync(user);
         if (userPartialUpdateDTO.ProfilePicture is not null)
-            await userPartialUpdateDTO.ProfilePicture!.SaveAsWebP(user.Id.ToString(), $"{_env.ContentRootPath}/{user.ProfilePicture!.SaveTo}");
+            await user.SaveProfilePicture(userPartialUpdateDTO.ProfilePicture, _env.ContentRootPath);
         return Response<UserDTO>.Success(UserDTO.FromModel(user, request));
     }
 

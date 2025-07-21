@@ -14,10 +14,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Email).HasMaxLength(150);
         builder.Property(u => u.PhoneNumber).HasMaxLength(13);
 
-        builder.HasOne(u => u.ProfilePicture)
-               .WithOne()
-               .HasForeignKey<User>(u => u.ProfilePictureId);
-
         builder.HasIndex(u => u.Email);
         builder.HasIndex(u => u.PhoneNumber);
     }

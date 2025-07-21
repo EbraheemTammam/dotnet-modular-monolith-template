@@ -53,7 +53,7 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
 
         services.AddScoped<CreateSuperUserCommand>();
 
-        services.AddScoped<VerificationRepository>();
+        services.AddScoped<VerificationManager>();
 
         services.AddScoped<HttpContextAccessor>();
 

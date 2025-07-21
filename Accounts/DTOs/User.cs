@@ -52,6 +52,6 @@ public record UserDTO
             FirstName = user.FirstName,
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber!,
-            ProfilePictureUrl = $"{request.Scheme}://{request.Host.Value}/{user.ProfilePicture?.Url}"
+            ProfilePictureUrl = $"{request.Scheme}://{request.Host.Value}/{user.ProfilePicture}"
         };
 }
