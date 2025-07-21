@@ -34,7 +34,7 @@ public static class WebAppExtensions
     {
         using var scope = app.Services.CreateAsyncScope();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-        await roleManager.CreateRolesIfNotExist(["superuser"]);
+        await roleManager.CreateRolesIfNotExist(["superuser", "user"]);
     }
 
     private static async Task CreateRolesIfNotExist(this RoleManager<IdentityRole<Guid>> roleManager, string[] roles)
