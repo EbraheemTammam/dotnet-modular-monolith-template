@@ -45,12 +45,13 @@ public class UserService : IUserService
     public async Task<Response<UserDTO>> GetUser(HttpRequest request, string searchField, string searchValue)
     {
         searchField = searchField.ToLower();
-        User? user = (
-            searchField == "id" ? await _userManager.FindByIdAsync(searchValue) :
-            searchField == "email" ? await _userManager.FindByEmailAsync(searchValue) :
-            searchField == "phone_number" ? await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == searchValue) :
-            null
-        );
+        User? user = searchField switch
+        {
+            "id" => await _userManager.FindByIdAsync(searchValue),
+            "email" => await _userManager.FindByEmailAsync(searchValue),
+            "phone_number" => await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == searchValue),
+            _ => null
+        };
         return user switch
         {
             null => Response<UserDTO>.NotFound(searchValue, nameof(User), searchField),
