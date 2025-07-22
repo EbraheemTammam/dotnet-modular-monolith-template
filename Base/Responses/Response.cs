@@ -32,6 +32,8 @@ public record Response
     public static Response Fail(string? message = null, int statusCode = 400) => new(statusCode, false, message);
     public static Response NotFound(string id, string resource, string idField = "id") =>
         new(404, false, $"{resource} with {idField} {id} Not Found");
+    public static Response NotFound(string message) =>
+        new(404, false, message);
     public static Response BadRequest(string message) => new(400, false, message);
     public static Response InternalServerError = new(500, false, "Something went wrong");
     public static Response UnAuthorized = new(401, false, "Email or password is incorrect");
@@ -50,6 +52,8 @@ public sealed record Response<TData> : Response
     public static new Response<TData> Fail(string? message = null, int statusCode = 400) => new(statusCode, default, false, message);
     public static new Response<TData> NotFound(string id, string resource, string idField = "id") =>
         new(404, default, false, $"{resource} with {idField} {id} Not Found");
+    public static new Response<TData> NotFound(string message) =>
+        new(404, default, false, message);
     public static new Response<TData> BadRequest(string message) => new(400, default, false, message);
     public static new Response<TData> InternalServerError = new(500, default, false, "Something went wrong");
     public static new Response<TData> UnAuthorized = new(401, default, false, "Email or password is incorrect");
