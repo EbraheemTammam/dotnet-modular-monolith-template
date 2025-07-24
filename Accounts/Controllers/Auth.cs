@@ -39,6 +39,10 @@ public class AuthController : ApiBaseController
     public async Task<ActionResult> ConfirmEmail([Required, EmailAddress] string email, [Required] string token) =>
         HandleResult(await _userService.ConfirmEmail(email, token));
 
+    [HttpPost("send-phone-number-verification")]
+    public async Task<ActionResult> SendPhoneNumberVerification([Required, Phone] string phoneNumber) =>
+        HandleResult(await _userService.SendPhoneNumberVerification(phoneNumber));
+
     [HttpPost("verify-phone-number")]
     public async Task<ActionResult> VerifyPhoneNumber([Required, Phone] string phoneNumber, [Required] string token) =>
         HandleResult(await _userService.VerifyPhoneNumber(phoneNumber, token));

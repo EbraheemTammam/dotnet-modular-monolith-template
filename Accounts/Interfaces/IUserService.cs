@@ -13,6 +13,7 @@ public interface IUserService
     Task<Response> DeleteUser(Guid id);
     Task<Response<UserDTO>> Register(HttpRequest request, UserAddDTO userCreateDTO, IUrlHelper Url);
     Task<Response> ConfirmEmail(string userId, string token);
+    Task<Response> SendPhoneNumberVerification(string phoneNumber);
     Task<Response> VerifyPhoneNumber(string phoneNumber, string token);
     Task<Response<UserDTO>> PartialUpdateUser(HttpRequest request, string userId, UserPartialUpdateDTO userPartialUpdateDTO);
     Task<Response> UpdatePassword(string userId, UserUpdatePasswordDTO userUpdatePasswordDTO);

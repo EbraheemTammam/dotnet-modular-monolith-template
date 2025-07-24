@@ -101,6 +101,13 @@ public class UserService : IUserService
         };
     }
 
+    public async Task<Response> SendPhoneNumberVerification(string phoneNumber)
+    {
+        User? user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+        if (user is not null) await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
+        return Response.Success();
+    }
+
     public async Task<Response> VerifyPhoneNumber(string phoneNumber, string token)
     {
         User? user = await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
