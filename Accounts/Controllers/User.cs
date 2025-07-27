@@ -18,11 +18,11 @@ public class AccountsController : ApiBaseController
 
     [HttpGet, Authorize(Roles = "superuser")]
     public ActionResult<IEnumerable<UserDTO>> GetAllUsers() =>
-        HandleResult(_userService.GetAllUsers(HttpContext.Request));
+        HandleResult(_userService.GetAllUsers());
 
-    [HttpGet("/search"), Authorize(Roles = "superuser")]
+    [HttpGet("search"), Authorize(Roles = "superuser")]
     public async Task<ActionResult<UserDTO>> GetUser([FromQuery, Required] string searchField, [FromQuery, Required] string searchValue) =>
-        HandleResult(await _userService.GetUser(HttpContext.Request, searchField, searchValue));
+        HandleResult(await _userService.GetUser(searchField, searchValue));
 
     [HttpDelete("{id}"), Authorize(Roles = "superuser")]
     public async Task<ActionResult> DeleteUser(Guid id) =>
@@ -30,12 +30,11 @@ public class AccountsController : ApiBaseController
 
     [HttpGet("profile"), Authorize]
     public async Task<ActionResult<UserDTO>> GetProfile() =>
-        HandleResult(await _userService.GetUser(HttpContext.Request, "id", HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+        HandleResult(await _userService.GetUser("id", HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!));
 
     [HttpPatch("update_profile"), Authorize]
     public async Task<ActionResult<UserDTO>> PartialUpdateUser([FromForm] UserPartialUpdateDTO userPartialUpdateDTO) =>
         HandleResult(await _userService.PartialUpdateUser(
-            HttpContext.Request,
             HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!,
             userPartialUpdateDTO
         ));

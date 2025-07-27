@@ -8,13 +8,12 @@ namespace Accounts.Interfaces;
 
 public interface IUserService
 {
-    Response<IEnumerable<UserDTO>> GetAllUsers(HttpRequest request);
-    Task<Response<UserDTO>> GetUser(HttpRequest request, string searchField, string searchValue);
+    Response<IEnumerable<UserDTO>> GetAllUsers();
+    Task<Response<UserDTO>> GetUser(string searchField, string searchValue);
     Task<Response> DeleteUser(Guid id);
     Task<Response<UserDTO>> Register(HttpRequest request, UserAddDTO userCreateDTO, IUrlHelper Url);
     Task<Response> ConfirmEmail(string userId, string token);
-    Task<Response> SendPhoneNumberVerification(string phoneNumber);
-    Task<Response> VerifyPhoneNumber(string phoneNumber, string token);
-    Task<Response<UserDTO>> PartialUpdateUser(HttpRequest request, string userId, UserPartialUpdateDTO userPartialUpdateDTO);
+    Task<Response> VerifyPhoneNumber(string UserId, string token);
+    Task<Response<UserDTO>> PartialUpdateUser(string userId, UserPartialUpdateDTO userPartialUpdateDTO);
     Task<Response> UpdatePassword(string userId, UserUpdatePasswordDTO userUpdatePasswordDTO);
 }

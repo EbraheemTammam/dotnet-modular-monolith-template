@@ -1,10 +1,8 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
 
 using Base.Interfaces;
-using Base.Utilities;
 using Accounts.Data;
 
 namespace Accounts.Models;
@@ -13,7 +11,6 @@ public class User : IdentityUser<Guid>
 {
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public string? ProfilePicture { get; set; }
     public DateOnly RegisteredAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public float WalletBalance { get; set; }
 
@@ -43,14 +40,5 @@ public class User : IdentityUser<Guid>
         };
         await verifications.AddAsync(verification);
         await notificationService.SendSms(PhoneNumber!, $"Your verification code is {code}");
-    }
-
-    public async Task SaveProfilePicture(IFormFile profilePicture, string rootPath)
-    {
-        string dir = "media/profile_pictures";
-        if (!Directory.Exists(Path.Combine(rootPath, dir)))
-            Directory.CreateDirectory(Path.Combine(rootPath, dir));
-        await profilePicture.SaveAsWebP(Path.Combine(rootPath, dir, Id.ToString()));
-        ProfilePicture = Path.Combine(dir, $"{Id}.webp");
     }
 }

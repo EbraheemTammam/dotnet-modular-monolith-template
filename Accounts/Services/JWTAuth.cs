@@ -28,9 +28,10 @@ public class TokenService : IJWTAuthService
     public async Task<Response<LoginResponseDTO>> LoginAsync(LoginDTO loginDTO)
     {
         User? user = _userManager.FindByEmailAsync(loginDTO.Email).Result;
-        if (user is null or not { PhoneNumberConfirmed: true }) return Response<LoginResponseDTO>.UnAuthorized;
-        bool passwordVerified = await _userManager.CheckPasswordAsync(user, loginDTO.Password);
-        if (!passwordVerified) return Response<LoginResponseDTO>.UnAuthorized;
+        if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
+
+        if (!await _userManager.CheckPasswordAsync(user, loginDTO.Password)) return Response<LoginResponseDTO>.UnAuthorized;
+
         var token = await GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
         await RefreshTokenUpdateOrCreate(refreshToken, user.Id);
@@ -85,7 +86,9 @@ public class TokenService : IJWTAuthService
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Email!),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Role, role),
+            new Claim("phone_number_verified", user.PhoneNumberConfirmed.ToString()),
+            new Claim("email_confirmed", user.EmailConfirmed.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY")!));
