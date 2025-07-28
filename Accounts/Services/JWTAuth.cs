@@ -5,8 +5,10 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 using Base.Responses;
+using Base.Interfaces;
 using Accounts.Models;
 using Accounts.DTOs;
 using Accounts.Interfaces;
@@ -16,19 +18,33 @@ namespace Accounts.Services;
 
 public class TokenService : IJWTAuthService
 {
+    private readonly AccountsDbContext _db;
     private readonly UserManager<User> _userManager;
-    private readonly AccountsDbContext _context;
+    private readonly INotificationService _notificationService;
+    private readonly VerificationManager _verifications;
 
-    public TokenService(UserManager<User> userManager, AccountsDbContext context)
+    public TokenService(
+        AccountsDbContext accountsDb,
+        UserManager<User> userManager,
+        INotificationService notificationService,
+        VerificationManager verifications
+        )
     {
+        _db = accountsDb;
         _userManager = userManager;
-        _context = context;
+        _notificationService = notificationService;
+        _verifications = verifications;
     }
 
     public async Task<Response<LoginResponseDTO>> LoginAsync(LoginDTO loginDTO)
     {
         User? user = _userManager.FindByEmailAsync(loginDTO.Email).Result;
         if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
+        if (!user.PhoneNumberConfirmed)
+        {
+            await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
+            return Response<LoginResponseDTO>.Fail("Phone number not confirmed", StatusCodes.Status403Forbidden);
+        }
 
         if (!await _userManager.CheckPasswordAsync(user, loginDTO.Password)) return Response<LoginResponseDTO>.UnAuthorized;
 
@@ -50,7 +66,7 @@ public class TokenService : IJWTAuthService
         User? user = await _userManager.FindByIdAsync(userId);
         if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
 
-        RefreshToken? refreshToken = _context.RefreshTokens.FirstOrDefault(t => t.Token == tokenDTO.RefreshToken && t.UserId == user.Id);
+        RefreshToken? refreshToken = _db.RefreshTokens.FirstOrDefault(t => t.Token == tokenDTO.RefreshToken && t.UserId == user.Id);
         if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
             return Response<LoginResponseDTO>.UnAuthorized;
 
@@ -65,7 +81,7 @@ public class TokenService : IJWTAuthService
             ),
             UserId = user.Id
         };
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return Response<LoginResponseDTO>.Success(new LoginResponseDTO
         {
@@ -120,7 +136,7 @@ public class TokenService : IJWTAuthService
 
     private async Task RefreshTokenUpdateOrCreate(string refreshTokenText, Guid userId)
     {
-        RefreshToken? refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId);
+        RefreshToken? refreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId);
         if (refreshToken is null)
         {
             refreshToken = new RefreshToken
@@ -131,7 +147,7 @@ public class TokenService : IJWTAuthService
                 ),
                 UserId = userId
             };
-            await _context.RefreshTokens.AddAsync(refreshToken);
+            await _db.RefreshTokens.AddAsync(refreshToken);
         }
         else
         {
@@ -140,9 +156,9 @@ public class TokenService : IJWTAuthService
                 double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
             );
             refreshToken.IsRevoked = false;
-            _context.RefreshTokens.Update(refreshToken);
+            _db.RefreshTokens.Update(refreshToken);
         }
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)

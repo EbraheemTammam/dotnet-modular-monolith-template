@@ -93,13 +93,13 @@ public class UserService : IUserService
         return Response.Success();
     }
 
-    public async Task<Response> VerifyPhoneNumber(string UserId, string token)
+    public async Task<Response> VerifyPhoneNumber(string PhoneNumber, string token)
     {
-        User user = (await _userManager.FindByIdAsync(UserId))!;
-        Verification? verification = await _verifications.GetAsync(user.PhoneNumber!);
-        if (user is null || verification is null || verification.Token != token)
+        Verification? verification = await _verifications.GetAsync(PhoneNumber);
+        if (verification is null || verification.Token != token)
             return Response.Fail("Invalid verification code");
 
+        User user = await _userManager.Users.FirstAsync(u => u.PhoneNumber == PhoneNumber);
         user.PhoneNumberConfirmed = true;
         await _userManager.UpdateAsync(user);
 

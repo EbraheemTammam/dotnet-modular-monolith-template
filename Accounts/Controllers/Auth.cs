@@ -39,12 +39,9 @@ public class AuthController : ApiBaseController
     public async Task<ActionResult> ConfirmEmail([Required, EmailAddress] string email, [Required] string token) =>
         HandleResult(await _userService.ConfirmEmail(email, token));
 
-    [HttpPost("verify-phone-number"), Authorize]
-    public async Task<ActionResult> VerifyPhoneNumber([Required] string token) =>
-        HandleResult(await _userService.VerifyPhoneNumber(
-            HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!,
-            token
-        ));
+    [HttpPost("verify-phone-number")]
+    public async Task<ActionResult> VerifyPhoneNumber([Required, Phone, FromBody] string PhoneNumber, [Required, FromBody] string Token) =>
+        HandleResult(await _userService.VerifyPhoneNumber(PhoneNumber, Token));
 
     [HttpPut("change-password"), Authorize]
     public async Task<ActionResult> ChangePassword(UserUpdatePasswordDTO userUpdatePasswordDTO) =>
