@@ -103,7 +103,6 @@ public class TokenService : IJWTAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Email!),
             new Claim(ClaimTypes.Role, role),
-            new Claim("phone_number_verified", user.PhoneNumberConfirmed.ToString()),
             new Claim("email_confirmed", user.EmailConfirmed.ToString())
         };
 
