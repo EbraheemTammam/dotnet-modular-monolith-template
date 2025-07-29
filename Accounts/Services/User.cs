@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 using Base.Responses;
-using Base.Data;
 using Base.Interfaces;
 using Accounts.DTOs;
 using Accounts.Interfaces;
@@ -44,7 +42,7 @@ public class UserService : IUserService
         UserDTO? user = await _db.Users.Where(
                                            searchField switch
                                            {
-                                               "id" => u => u.Id == new Guid(searchValue),
+                                               "id" => u => u.Id == Guid.Parse(searchValue),
                                                "email" => u => u.Email == searchValue,
                                                "phone_number" => u => u.PhoneNumber == searchValue,
                                                _ => u => false

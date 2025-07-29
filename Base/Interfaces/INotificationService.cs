@@ -1,5 +1,3 @@
-using Base.Responses;
-
 namespace Base.Interfaces;
 
 public interface INotificationService
