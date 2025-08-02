@@ -57,6 +57,8 @@ internal class {0}ModuleRegistrar : IModuleRegistrar
         command.SetHandler((appName) =>
         {
             appName = $"{appName.Substring(0, 1).ToUpper()}{appName.Substring(1).ToLower()}";
+            appName = appName.Replace("-", string.Empty);
+            appName = appName.Replace(" ", "_");
 
             ProcessStartInfo processInfo = new ProcessStartInfo
             {
