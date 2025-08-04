@@ -21,9 +21,10 @@ public class VerificationManager
 
     public async Task AddAsync(Verification verification)
     {
-        await _db.KeyDeleteAsync(verification.PhoneNumber);
+        string key = $"verification:{verification.PhoneNumber}";
+        await _db.KeyDeleteAsync(key);
         await _db.StringSetAsync(
-            verification.PhoneNumber,
+            key,
             JsonSerializer.Serialize(verification.Token),
             TimeSpan.FromMinutes(5)
         );
