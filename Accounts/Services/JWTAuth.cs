@@ -38,8 +38,13 @@ public class TokenService : IJWTAuthService
 
     public async Task<Response<LoginResponseDTO>> LoginAsync(LoginDTO loginDTO)
     {
-        User? user = _userManager.FindByEmailAsync(loginDTO.Email).Result;
+        User? user = await (
+            from u in _db.Users
+            where u.Email == loginDTO.Email
+            select u
+        ).FirstOrDefaultAsync();
         if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
+
         if (!user.PhoneNumberConfirmed)
         {
             await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
@@ -63,10 +68,19 @@ public class TokenService : IJWTAuthService
         var principal = GetPrincipalFromExpiredToken(tokenDTO.AccessToken);
         string userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
 
-        User? user = await _userManager.FindByIdAsync(userId);
+        User? user = await (
+            from u in _db.Users
+            where u.Id == Guid.Parse(userId)
+            select u
+        ).FirstOrDefaultAsync();
         if (user is null) return Response<LoginResponseDTO>.UnAuthorized;
 
-        RefreshToken? refreshToken = _db.RefreshTokens.FirstOrDefault(t => t.Token == tokenDTO.RefreshToken && t.UserId == user.Id);
+        RefreshToken? refreshToken = await (
+            from rt in _db.RefreshTokens
+            where rt.Token == tokenDTO.RefreshToken
+               && rt.UserId == user.Id
+            select rt
+        ).FirstOrDefaultAsync();
         if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
             return Response<LoginResponseDTO>.UnAuthorized;
 
@@ -135,7 +149,11 @@ public class TokenService : IJWTAuthService
 
     private async Task RefreshTokenUpdateOrCreate(string refreshTokenText, Guid userId)
     {
-        RefreshToken? refreshToken = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId);
+        RefreshToken? refreshToken = await (
+            from rt in _db.RefreshTokens
+            where rt.UserId == userId
+            select rt
+        ).FirstOrDefaultAsync();
         if (refreshToken is null)
         {
             refreshToken = new RefreshToken

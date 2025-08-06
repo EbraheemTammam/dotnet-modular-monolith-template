@@ -33,23 +33,28 @@ public class UserService : IUserService
 
     public Response<IEnumerable<UserDTO>> GetAllUsers() =>
         Response<IEnumerable<UserDTO>>.Success(
-            _db.Users.Select(u => UserDTO.FromModel(u))
+            from u in _db.Users
+            select UserDTO.FromModel(u)
         );
 
     public async Task<Response<UserDTO>> GetUser(string searchField, string searchValue)
     {
         searchField = searchField.ToLower();
-        UserDTO? user = await _db.Users.Where(
-                                           searchField switch
-                                           {
-                                               "id" => u => u.Id == Guid.Parse(searchValue),
-                                               "email" => u => u.Email == searchValue,
-                                               "phone_number" => u => u.PhoneNumber == searchValue,
-                                               _ => u => false
-                                           }
-                                       )
-                                       .Select(u => UserDTO.FromModel(u))
-                                       .FirstOrDefaultAsync();
+
+        Predicate<User> predicate = searchField switch
+        {
+            "id" => u => u.Id == Guid.Parse(searchValue),
+            "email" => u => u.Email == searchValue,
+            "phone_number" => u => u.PhoneNumber == searchValue,
+            _ => u => false
+        };
+
+        UserDTO? user = await (
+            from u in _db.Users
+            where predicate(u)
+            select UserDTO.FromModel(u)
+        ).FirstOrDefaultAsync();
+
         return user switch
         {
             null => Response<UserDTO>.NotFound(searchValue, nameof(User), searchField),
@@ -59,9 +64,15 @@ public class UserService : IUserService
 
     public async Task<Response> DeleteUser(Guid id)
     {
-        User? user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        User? user = await (
+            from u in _db.Users
+            where u.Id == id
+            select u
+        ).FirstOrDefaultAsync();
+
         if (user is null)
             return Response<UserDTO>.NotFound(id.ToString(), nameof(User));
+
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
         return Response.Success();
@@ -97,7 +108,11 @@ public class UserService : IUserService
         if (verification is null || verification.Token != token)
             return Response.Fail("Invalid verification code");
 
-        User user = await _userManager.Users.FirstAsync(u => u.PhoneNumber == PhoneNumber);
+        User user = await (
+            from u in _db.Users
+            where u.PhoneNumber == PhoneNumber
+            select u
+        ).FirstAsync();
         user.PhoneNumberConfirmed = true;
         await _userManager.UpdateAsync(user);
 
@@ -106,8 +121,13 @@ public class UserService : IUserService
 
     public async Task<Response<UserDTO>> PartialUpdateUser(string userId, UserPartialUpdateDTO userPartialUpdateDTO)
     {
-        User? user = await _userManager.FindByIdAsync(userId);
+        User? user = await (
+            from u in _db.Users
+            where u.Id == Guid.Parse(userId)
+            select u
+        ).FirstOrDefaultAsync();
         if (user is null) return Response<UserDTO>.NotFound(userId, nameof(User));
+
         user.FirstName = userPartialUpdateDTO.FirstName ?? user.FirstName;
         user.LastName = userPartialUpdateDTO.LastName ?? user.LastName;
         await _userManager.UpdateAsync(user);
@@ -116,8 +136,13 @@ public class UserService : IUserService
 
     public async Task<Response> UpdatePassword(string userId, UserUpdatePasswordDTO userUpdatePasswordDTO)
     {
-        User? user = await _userManager.FindByIdAsync(userId);
+        User? user = await (
+            from u in _db.Users
+            where u.Id == Guid.Parse(userId)
+            select u
+        ).FirstOrDefaultAsync();
         if (user is null) return Response.NotFound(userId, nameof(User));
+
         await _userManager.ChangePasswordAsync(user, userUpdatePasswordDTO.CurrentPassword, userUpdatePasswordDTO.NewPassword);
         return Response.Success();
     }
