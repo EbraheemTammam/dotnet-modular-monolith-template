@@ -45,8 +45,5 @@ public class AuthController : ApiBaseController
 
     [HttpPut("change-password"), Authorize]
     public async Task<ActionResult> ChangePassword(UserUpdatePasswordDTO userUpdatePasswordDTO) =>
-        HandleResult(await _userService.UpdatePassword(
-            HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!,
-            userUpdatePasswordDTO
-        ));
+        HandleResult(await _userService.UpdatePassword(User.Identity!.Name!, userUpdatePasswordDTO));
 }

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -30,12 +29,9 @@ public class AccountsController : ApiBaseController
 
     [HttpGet("profile"), Authorize]
     public async Task<ActionResult<UserDTO>> GetProfile() =>
-        HandleResult(await _userService.GetUser("id", HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+        HandleResult(await _userService.GetUser("id", User.Identity!.Name!));
 
     [HttpPatch("update_profile"), Authorize]
     public async Task<ActionResult<UserDTO>> PartialUpdateUser([FromForm] UserPartialUpdateDTO userPartialUpdateDTO) =>
-        HandleResult(await _userService.PartialUpdateUser(
-            HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)!,
-            userPartialUpdateDTO
-        ));
+        HandleResult(await _userService.PartialUpdateUser(User.Identity!.Name!, userPartialUpdateDTO));
 }
