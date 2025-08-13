@@ -48,7 +48,7 @@ public class TokenService : IJWTAuthService
         if (!user.PhoneNumberConfirmed)
         {
             await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
-            return Response<LoginResponseDTO>.Fail("Phone number not confirmed", StatusCodes.Status403Forbidden);
+            return Response<LoginResponseDTO>.Forbidden("Phone number not confirmed");
         }
 
         if (!await _userManager.CheckPasswordAsync(user, loginDTO.Password)) return Response<LoginResponseDTO>.UnAuthorized;
@@ -56,7 +56,7 @@ public class TokenService : IJWTAuthService
         var token = await GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
         await RefreshTokenUpdateOrCreate(refreshToken, user.Id);
-        return Response<LoginResponseDTO>.Success(new LoginResponseDTO
+        return Response<LoginResponseDTO>.Ok(new LoginResponseDTO
         {
             AccessToken = token,
             RefreshToken = refreshToken
@@ -97,7 +97,7 @@ public class TokenService : IJWTAuthService
         };
         await _db.SaveChangesAsync();
 
-        return Response<LoginResponseDTO>.Success(new LoginResponseDTO
+        return Response<LoginResponseDTO>.Ok(new LoginResponseDTO
         {
             AccessToken = newAccessToken,
             RefreshToken = newRefreshToken

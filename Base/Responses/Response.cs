@@ -35,9 +35,13 @@ public record Response
     public static Response NotFound(string message) =>
         new(404, false, message);
     public static Response BadRequest(string message) => new(400, false, message);
-    public static Response InternalServerError = new(500, false, "Something went wrong");
-    public static Response UnAuthorized = new(401, false, "Email or password is incorrect");
-    public static Response Forbidden = new(403, false, "Permission denied");
+    public static Response InternalServerError => new(500, false, "Something went wrong");
+    public static Response UnAuthorized => new(401, false, "Email or password is incorrect");
+    public static Response Forbidden(string? message = null) => new(403, false, message ?? "Permission denied");
+    public static Response NoContent => new(204, true);
+    public static Response Created => new(201, true);
+    public static Response Ok => new(200, true);
+    public static Response Conflict(string? message = null) => new(409, false, message);
 }
 
 public sealed record Response<TData> : Response
@@ -55,7 +59,11 @@ public sealed record Response<TData> : Response
     public static new Response<TData> NotFound(string message) =>
         new(404, default, false, message);
     public static new Response<TData> BadRequest(string message) => new(400, default, false, message);
-    public static new Response<TData> InternalServerError = new(500, default, false, "Something went wrong");
-    public static new Response<TData> UnAuthorized = new(401, default, false, "Email or password is incorrect");
-    public static new Response<TData> Forbidden = new(403, default, false, "Permission denied");
+    public static new Response<TData> InternalServerError => new(500, default, false, "Something went wrong");
+    public static new Response<TData> UnAuthorized => new(401, default, false, "Email or password is incorrect");
+    public static new Response<TData> Forbidden(string? message = null) => new(403, default, false, message ?? "Permission denied");
+    public static new Response<TData> NoContent => new(204, default, true);
+    public static new Response<TData> Created(TData? data) => new(201, data, true);
+    public static new Response<TData> Ok(TData? data) => new(200, data, true);
+    public static new Response<TData> Conflict(string? message = null) => new(409, default, false, message);
 }

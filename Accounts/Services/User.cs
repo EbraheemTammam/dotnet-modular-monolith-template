@@ -32,7 +32,7 @@ public class UserService : IUserService
     }
 
     public Response<IEnumerable<UserDTO>> GetAllUsers() =>
-        Response<IEnumerable<UserDTO>>.Success(
+        Response<IEnumerable<UserDTO>>.Ok(
             from u in _db.Users
             select UserDTO.FromModel(u)
         );
@@ -58,7 +58,7 @@ public class UserService : IUserService
         return user switch
         {
             null => Response<UserDTO>.NotFound(searchValue, nameof(User), searchField),
-            _ => Response<UserDTO>.Success(user)
+            _ => Response<UserDTO>.Ok(user)
         };
     }
 
@@ -75,20 +75,20 @@ public class UserService : IUserService
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
-        return Response.Success();
+        return Response.NoContent;
     }
 
     public async Task<Response<UserDTO>> Register(HttpRequest request, UserAddDTO userAddDTO, IUrlHelper Url)
     {
         User user = userAddDTO.ToModel();
         var res = await _userManager.CreateAsync(user, userAddDTO.Password);
-        if (!res.Succeeded) return Response<UserDTO>.Fail(res.Errors.First().Description);
+        if (!res.Succeeded) return Response<UserDTO>.BadRequest(res.Errors.First().Description);
         await _userManager.AddToRoleAsync(user, "user");
 
         await user.SendEmailConfirmation(_userManager, request.Scheme, _notificationService, Url);
         await user.SendPhoneNumberConfirmation(_notificationService, _verifications);
 
-        return Response<UserDTO>.Success(UserDTO.FromModel(user));
+        return Response<UserDTO>.Created(UserDTO.FromModel(user));
     }
 
     public async Task<Response> ConfirmEmail(string userId, string token)
@@ -97,16 +97,16 @@ public class UserService : IUserService
         if (user is null) return Response.NotFound(userId, nameof(User));
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
-        if (!result.Succeeded) return Response.Fail(result.Errors.First().Description);
+        if (!result.Succeeded) return Response.BadRequest(result.Errors.First().Description);
 
-        return Response.Success();
+        return Response.Ok;
     }
 
     public async Task<Response> VerifyPhoneNumber(string PhoneNumber, string token)
     {
         Verification? verification = await _verifications.GetAsync(PhoneNumber);
         if (verification is null || verification.Token != token)
-            return Response.Fail("Invalid verification code");
+            return Response.BadRequest("Invalid verification code");
 
         User user = await (
             from u in _db.Users
@@ -116,7 +116,7 @@ public class UserService : IUserService
         user.PhoneNumberConfirmed = true;
         await _userManager.UpdateAsync(user);
 
-        return Response.Success();
+        return Response.Ok;
     }
 
     public async Task<Response<UserDTO>> PartialUpdateUser(string userId, UserPartialUpdateDTO userPartialUpdateDTO)
@@ -131,7 +131,7 @@ public class UserService : IUserService
         user.FirstName = userPartialUpdateDTO.FirstName ?? user.FirstName;
         user.LastName = userPartialUpdateDTO.LastName ?? user.LastName;
         await _userManager.UpdateAsync(user);
-        return Response<UserDTO>.Success(UserDTO.FromModel(user));
+        return Response<UserDTO>.Created(UserDTO.FromModel(user));
     }
 
     public async Task<Response> UpdatePassword(string userId, UserUpdatePasswordDTO userUpdatePasswordDTO)
@@ -144,6 +144,6 @@ public class UserService : IUserService
         if (user is null) return Response.NotFound(userId, nameof(User));
 
         await _userManager.ChangePasswordAsync(user, userUpdatePasswordDTO.CurrentPassword, userUpdatePasswordDTO.NewPassword);
-        return Response.Success();
+        return Response.Created;
     }
 }
