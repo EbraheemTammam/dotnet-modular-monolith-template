@@ -33,22 +33,45 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
         .AddDefaultTokenProviders();
 
         services.AddAuthentication();
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_ISSUER")!),
+                ValidateAudience = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_AUDIENCE")!),
+                ValidateLifetime = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_LIFETIME")!),
+                ValidateIssuerSigningKey = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_ISSUER_SIGNING_KEY")!),
+                ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
+                ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY")!)
+                )
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_ISSUER")!),
-                        ValidateAudience = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_AUDIENCE")!),
-                        ValidateLifetime = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_LIFETIME")!),
-                        ValidateIssuerSigningKey = bool.Parse(Environment.GetEnvironmentVariable("JWT_VALIDATE_ISSUER_SIGNING_KEY")!),
-                        ValidIssuer = Environment.GetEnvironmentVariable("JWT_VALID_ISSUER"),
-                        ValidAudience = Environment.GetEnvironmentVariable("JWT_VALID_AUDIENCE"),
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY")!)
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        (
+                            path.StartsWithSegments("/hubs/location") ||
+                            path.StartsWithSegments("/hubs/ride-request")
                         )
-                    };
-                });
+                    )
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
         services.AddAuthorization();
 
         services.AddScoped<CreateSuperUserCommand>();

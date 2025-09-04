@@ -15,7 +15,7 @@ public class AccountsController : ApiBaseController
     public AccountsController(IUserService userService) =>
         _userService = userService;
 
-    [HttpGet, Authorize(Roles = "superuser")]
+    [HttpGet, Authorize]
     public ActionResult<IEnumerable<UserDTO>> GetAllUsers() =>
         HandleResult(_userService.GetAllUsers());
 
