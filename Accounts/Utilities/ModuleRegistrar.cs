@@ -52,6 +52,24 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
                     Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY")!)
                 )
             };
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        (
+                            path.StartsWithSegments("/hubs/location") ||
+                            path.StartsWithSegments("/hubs/ride-request")
+                        )
+                    )
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         });
         services.AddAuthorization();
 
