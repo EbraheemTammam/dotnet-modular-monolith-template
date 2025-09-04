@@ -19,11 +19,11 @@ public class AuthController : ApiBaseController
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResponseDTO>> Login([FromForm] LoginDTO loginDTO) =>
+    public async Task<ActionResult<LoginResponseDTO>> Login(LoginDTO loginDTO) =>
         HandleResult(await _jwtAuthService.LoginAsync(loginDTO));
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<LoginResponseDTO>> Refresh([FromForm] LoginResponseDTO tokenDTO) =>
+    public async Task<ActionResult<LoginResponseDTO>> Refresh(LoginResponseDTO tokenDTO) =>
         HandleResult(await _jwtAuthService.RefreshAsync(tokenDTO));
 
     [HttpPost("logout")]
@@ -31,7 +31,7 @@ public class AuthController : ApiBaseController
         HandleResult(await _jwtAuthService.LogoutAsync());
 
     [HttpPost("register")]
-    public async Task<ActionResult<UserDTO>> Register([FromForm] UserAddDTO userAddDTO) =>
+    public async Task<ActionResult<UserDTO>> Register(UserAddDTO userAddDTO) =>
         HandleResult(await _userService.Register(HttpContext.Request, userAddDTO, Url));
 
     [HttpPost("confirm-email")]
