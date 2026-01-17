@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Accounts/Accounts.csproj" />
+  <Project Path="Base/Base.csproj" />
+  <Project Path="EntryPoint/EntryPoint.csproj" />
+</Solution>
