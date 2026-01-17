@@ -46,16 +46,16 @@ internal class {0}ModuleRegistrar : IModuleRegistrar
 
     public Command CreateCommand()
     {
-        var appNameArg = new Argument<string>(
-            name: "AppName",
-            description: "App name"
-        );
+        var appNameArg = new Argument<string>(name: "AppName");
 
         var command = new Command("startapp", "Generates a new module") { appNameArg };
         string basePath = Directory.GetCurrentDirectory().Replace("/EntryPoint", string.Empty);
 
-        command.SetHandler((appName) =>
+        command.SetAction(parseResult =>
         {
+            string? appName = parseResult.GetValue(appNameArg);
+            if(string.IsNullOrEmpty(appName))
+                throw new ArgumentException("App name is required.");
             appName = $"{appName.Substring(0, 1).ToUpper()}{appName.Substring(1).ToLower()}";
             appName = appName.Replace("-", string.Empty);
             appName = appName.Replace(" ", "_");
@@ -178,7 +178,7 @@ internal class {0}ModuleRegistrar : IModuleRegistrar
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Interfaces"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Services"));
             Directory.CreateDirectory(Path.Combine(basePath, appName, "Controllers"));
-        }, appNameArg);
+        });
 
         return command;
     }

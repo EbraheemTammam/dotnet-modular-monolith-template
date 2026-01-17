@@ -14,67 +14,34 @@ public class CreateSuperUserCommand
 
     public Command CreateCommand()
     {
-        var firstNameArg = new Argument<string>(
-            name: "firstname",
-            description: "First name of the superuser",
-            getDefaultValue: () => string.Empty
-        );
+        var command = new Command("createsuperuser", "Create a superuser for the application");
 
-        var lastNameArg = new Argument<string>(
-            name: "lastname",
-            description: "Last name of the superuser",
-            getDefaultValue: () => string.Empty
-        );
-
-        var emailArg = new Argument<string>(
-            name: "email",
-            description: "Email address of the superuser",
-            getDefaultValue: () => string.Empty
-        );
-
-        var passwordArg = new Argument<string>(
-            name: "password",
-            description: "Password of the superuser",
-            getDefaultValue: () => string.Empty
-        );
-
-        var command = new Command("createsuperuser", "Create a superuser for the application")
+        command.SetAction(async parseResult =>
         {
-            firstNameArg,
-            lastNameArg,
-            emailArg,
-            passwordArg
-        };
+            string firstName = ConsoleInput(
+                "First Name: ", 
+                value => string.IsNullOrEmpty(value) ? 
+                throw new ArgumentException("first name is required.") : value
+            );
 
-        command.SetHandler(async (firstName, lastName, email, password) =>
-        {
-            firstName = GetConsoleInputIfEmpty(firstName, "Enter first name: ", value =>
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("A first name is required.");
-                return value;
-            });
+            string lastName = ConsoleInput(
+                "Last Name: ",
+                value => string.IsNullOrWhiteSpace(value) ? 
+                throw new ArgumentException("last name is required.") : value
+            );
 
-            lastName = GetConsoleInputIfEmpty(lastName, "Enter last name: ", value =>
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("A last name is required.");
-                return value;
-            });
+            string email = ConsoleInput(
+                "Email: ",
+                value => string.IsNullOrWhiteSpace(value) || !value.Contains("@") ? 
+                throw new ArgumentException("a valid email is required.") : value
+            );
 
-            email = GetConsoleInputIfEmpty(email, "Enter email address: ", value =>
-            {
-                if (string.IsNullOrWhiteSpace(value) || !value.Contains("@"))
-                    throw new ArgumentException("A valid email address is required.");
-                return value;
-            });
-
-            password = GetConsoleInputIfEmpty(password, "Enter password: ", value =>
-            {
-                if (string.IsNullOrWhiteSpace(value) || value.Length < 6)
-                    throw new ArgumentException("Password must be at least 6 characters long.");
-                return value;
-            }, hideInput: true);
+            string password = ConsoleInput(
+                "Password: ",
+                value => string.IsNullOrWhiteSpace(value) || value.Length < 6 ? 
+                throw new ArgumentException("Password must be at least 6 characters long.") : value,
+                hideInput: true
+            );
 
             var user = new User
             {
@@ -89,7 +56,7 @@ public class CreateSuperUserCommand
             var result = await _userManager.CreateAsync(user, password);
             if (result.Succeeded)
             {
-                Console.WriteLine($"Superuser '{user.GetFullName()}' created successfully.");
+                Console.WriteLine($"Superuser '{user.FullName}' created successfully.");
                 await _userManager.AddToRoleAsync(user, "superuser");
             }
             else
@@ -100,21 +67,17 @@ public class CreateSuperUserCommand
                     Console.WriteLine($"- {error.Description}");
                 }
             }
-        }, firstNameArg, lastNameArg, emailArg, passwordArg);
+        });
 
         return command;
     }
 
-    private static string GetConsoleInputIfEmpty(
-        string input,
+    private static string ConsoleInput(
         string prompt,
         Func<string, string> validator,
         bool hideInput = false
     )
     {
-        if (!string.IsNullOrWhiteSpace(input))
-            return input;
-
         Console.Write(prompt);
         string? value;
         if (hideInput)

@@ -12,8 +12,7 @@ public class User : IdentityUser<Guid>
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public DateOnly RegisteredAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
-
-    public string GetFullName() => $"{FirstName} {LastName}";
+    public string FullName => $"{FirstName} {LastName}";
 
     public async Task SendEmailConfirmation(UserManager<User> userManager, string scheme, INotificationService notificationService, IUrlHelper Url)
     {

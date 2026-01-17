@@ -9,22 +9,18 @@ public class MakeMigrationsCommand
 
     public Command CreateCommand()
     {
-        var appNameArg = new Argument<string>(
-            name: "ModuleName",
-            description: "Module name",
-            getDefaultValue: () => string.Empty
-        );
-
-        var nameFlag = new Option<string>(
-            name: "--name",
-            description: "Name of the migration",
-            getDefaultValue: () => string.Empty
-        );
+        var appNameArg = new Argument<string>(name: "ModuleName");
+        var nameFlag = new Option<string>(name: "--name");
 
         var command = new Command("makemigrations", "Make migration files for specified app") { appNameArg, nameFlag };
 
-        command.SetHandler( (appName, migrationName) =>
+        command.SetAction(ParseResult =>
         {
+            string? appName = ParseResult.GetValue(appNameArg);
+            if (string.IsNullOrEmpty(appName))
+                throw new ArgumentException("App Name is required.");
+
+            string? migrationName = ParseResult.GetValue(nameFlag);
             if (string.IsNullOrWhiteSpace(migrationName))
                 migrationName = $"{Guid.NewGuid()}_{appName}";
 
@@ -54,7 +50,7 @@ public class MakeMigrationsCommand
                     Console.WriteLine(error);
                 }
             }
-        }, appNameArg, nameFlag);
+        });
 
         return command;
     }

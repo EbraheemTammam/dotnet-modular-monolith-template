@@ -81,7 +81,7 @@ public class TokenService : IJWTAuthService
                && rt.UserId == user.Id
             select rt
         ).FirstOrDefaultAsync();
-        if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+        if (refreshToken == null || refreshToken.Expiry < DateTime.UtcNow)
             return Response<LoginResponseDTO>.UnAuthorized;
 
         var newAccessToken = await GenerateAccessToken(user);
@@ -90,7 +90,7 @@ public class TokenService : IJWTAuthService
         refreshToken = new RefreshToken
         {
             Token = newRefreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(
+            Expiry = DateTime.UtcNow.AddDays(
                 double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
             ),
             UserId = user.Id
@@ -159,7 +159,7 @@ public class TokenService : IJWTAuthService
             refreshToken = new RefreshToken
             {
                 Token = refreshTokenText,
-                ExpiresAt = DateTime.UtcNow.AddDays(
+                Expiry = DateTime.UtcNow.AddDays(
                     double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
                 ),
                 UserId = userId
@@ -169,7 +169,7 @@ public class TokenService : IJWTAuthService
         else
         {
             refreshToken.Token = refreshTokenText;
-            refreshToken.ExpiresAt = DateTime.UtcNow.AddDays(
+            refreshToken.Expiry = DateTime.UtcNow.AddDays(
                 double.Parse(Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_EXPIRY_DAYS")!)
             );
             refreshToken.IsRevoked = false;

@@ -31,12 +31,12 @@ if (args.Length > 0)
     if (args[0].ToLower() == "createsuperuser")
     {
         var command = scope.ServiceProvider.GetRequiredService<CreateSuperUserCommand>();
-        rootCommand.AddCommand(command.CreateCommand());
+        rootCommand.Subcommands.Add(command.CreateCommand());
     }
     else if (args[0].ToLower() == "startapp")
     {
         var command = scope.ServiceProvider.GetRequiredService<StartAppCommand>();
-        rootCommand.AddCommand(command.CreateCommand());
+        rootCommand.Subcommands.Add(command.CreateCommand());
     }
     else if (args[0].ToLower() == "makemigrations")
     {
@@ -47,9 +47,9 @@ if (args.Length > 0)
             return;
         }
         var command = scope.ServiceProvider.GetRequiredService<MakeMigrationsCommand>();
-        rootCommand.AddCommand(command.CreateCommand());
+        rootCommand.Subcommands.Add(command.CreateCommand());
     }
-    await rootCommand.InvokeAsync(args);
+    await rootCommand.Parse(args).InvokeAsync();
 }
 else
 {

@@ -16,7 +16,7 @@ public class VerificationManager
     {
         RedisValue verification = await _db.StringGetAsync(phoneNumber);
         if(verification.IsNull) return null;
-        return JsonSerializer.Deserialize<Verification>(verification!);
+        return JsonSerializer.Deserialize<Verification>(verification.ToString());
     }
 
     public async Task AddAsync(Verification verification)
