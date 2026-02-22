@@ -1,8 +1,7 @@
 using System.CommandLine;
 using DotNetEnv;
-using Twilio;
 
-using Base.Commands;
+using Shared.Commands;
 using Accounts.Commands;
 using EntryPoint.Utilities;
 
@@ -11,15 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Configuration.AddEnvironmentVariables();
 
-string[] modules = ["Base", "Accounts"];
+string[] modules = ["Shared", "Accounts"];
 
 builder.Services.RegisterModules(modules);
 builder.Services.Configure();
-
-TwilioClient.Init(
-    Environment.GetEnvironmentVariable("TWILIO_ACCOUNT_SID"),
-    Environment.GetEnvironmentVariable("TWILIO_AUTH_TOKEN")
-);
 
 var app = builder.Build();
 
@@ -54,6 +48,6 @@ if (args.Length > 0)
 else
 {
     app.Configure();
-    app.RegisterModules(modules);
+    app.RegisterModules(modules[1..]);
     await app.RunAsync();
 }

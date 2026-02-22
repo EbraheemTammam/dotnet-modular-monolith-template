@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 
-using Base.Responses;
+using Shared.Responses;
 using Accounts.DTOs;
 
 namespace Accounts.Interfaces;

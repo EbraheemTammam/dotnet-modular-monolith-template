@@ -1,7 +1,7 @@
 using System.CommandLine;
 using System.Diagnostics;
 
-namespace Base.Commands;
+namespace Shared.Commands;
 
 public class StartAppCommand
 {
@@ -30,7 +30,7 @@ public sealed class {0}DbContext : DbContext
         _moduleRegistrarContent = @"using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
-using Base.Interfaces;
+using Shared.Interfaces;
 using {0}.Data;
 
 namespace {0}.Utilities;
@@ -87,7 +87,7 @@ internal class {0}ModuleRegistrar : IModuleRegistrar
             processInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"add {appName} reference Base",
+                Arguments = $"add {appName} reference Shared",
                 WorkingDirectory = basePath,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,

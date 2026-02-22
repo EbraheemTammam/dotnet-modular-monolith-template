@@ -1,7 +1,7 @@
 using System.CommandLine;
 using System.Diagnostics;
 
-namespace Base.Commands;
+namespace Shared.Commands;
 
 public class MakeMigrationsCommand
 {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Base.Interfaces;
+namespace Shared.Interfaces;
 
 public interface IModuleRegistrar
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-using Base.Responses;
+using Shared.Responses;
 using Accounts.Models;
 using Accounts.DTOs;
 using Accounts.Interfaces;

@@ -25,7 +25,6 @@ public static class WebAppExtensions
     {
         foreach (string module in modules)
         {
-            if (module == "Base") continue;
             app.Services.MigrateDatabase(module);
         }
     }

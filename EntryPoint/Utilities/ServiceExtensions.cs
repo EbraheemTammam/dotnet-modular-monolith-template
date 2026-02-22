@@ -1,6 +1,6 @@
 using StackExchange.Redis;
 
-using Base.Interfaces;
+using Shared.Interfaces;
 
 namespace EntryPoint.Utilities;
 

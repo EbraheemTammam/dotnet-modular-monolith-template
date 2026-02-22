@@ -1,4 +1,4 @@
-using Base.Responses;
+using Shared.Responses;
 using Accounts.DTOs;
 
 namespace Accounts.Interfaces;

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using Base.Responses;
+using Shared.Responses;
 
-namespace Base.Controllers;
+namespace Shared.Controllers;
 
 [ApiController, Route("Api/[controller]")]
 public abstract class ApiBaseController : ControllerBase

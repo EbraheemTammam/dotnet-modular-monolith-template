@@ -1,4 +1,4 @@
-namespace Base.Responses;
+namespace Shared.Responses;
 
 public record Response
 {
@@ -6,15 +6,24 @@ public record Response
     {
         if (statusCode < 200 || statusCode > 599)
         {
-            throw new ArgumentOutOfRangeException(nameof(statusCode), "Status code should be between 200 and 599");
+            throw new ArgumentOutOfRangeException(
+                nameof(statusCode), 
+                "Status code should be between 200 and 599"
+            );
         }
         if (succeeded && statusCode >= 400)
         {
-            throw new ArgumentOutOfRangeException(nameof(statusCode), "Status code should be less than 400 for successful responses");
+            throw new ArgumentOutOfRangeException(
+                nameof(statusCode), 
+                "Status code should be less than 400 for successful responses"
+            );
         }
         if (!succeeded && statusCode < 400)
         {
-            throw new ArgumentOutOfRangeException(nameof(statusCode), "Status code should be greater than 400 for unsuccessful responses");
+            throw new ArgumentOutOfRangeException(
+                nameof(statusCode), 
+                "Status code should be greater than 400 for unsuccessful responses"
+            );
         }
         return true;
     }

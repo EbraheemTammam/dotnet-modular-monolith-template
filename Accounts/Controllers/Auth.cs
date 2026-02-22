@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Base.Controllers;
+using Shared.Controllers;
 using Accounts.DTOs;
 using Accounts.Interfaces;
 

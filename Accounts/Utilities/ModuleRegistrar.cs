@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 
-using Base.Interfaces;
+using Shared.Interfaces;
 using Accounts.Data;
 using Accounts.Models;
 using Accounts.Commands;
@@ -73,16 +73,15 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
         });
         services.AddAuthorization();
 
+        // cli
         services.AddScoped<CreateSuperUserCommand>();
-
+        // repositories
         services.AddScoped<VerificationManager>();
-
+        // internals
         services.AddScoped<HttpContextAccessor>();
-
+        // hashers
         services.AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
-
-        services.AddScoped<IUserService, UserService>();
+        // services
         services.AddScoped<ICookieAuthService, CookieAuthService>();
-        services.AddScoped<IJWTAuthService, TokenService>();
     }
 }
