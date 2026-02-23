@@ -3,7 +3,7 @@ using Accounts.DTOs;
 
 namespace Accounts.Interfaces;
 
-public interface ICookieAuthService
+public interface IAuthService
 {
     Task<Response> LoginAsync(LoginDTO loginDTO);
     Task<Response> LogoutAsync();

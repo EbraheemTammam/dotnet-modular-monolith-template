@@ -82,6 +82,6 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
         // hashers
         services.AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
         // services
-        services.AddScoped<ICookieAuthService, CookieAuthService>();
+        services.AddScoped<IAuthService, AuthService>();
     }
 }

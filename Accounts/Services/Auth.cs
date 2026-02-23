@@ -7,12 +7,12 @@ using Accounts.Interfaces;
 
 namespace Accounts.Services;
 
-internal class CookieAuthService : ICookieAuthService
+internal class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
 
-    public CookieAuthService(UserManager<User> manager, SignInManager<User> signInManager)
+    public AuthService(UserManager<User> manager, SignInManager<User> signInManager)
     {
         _userManager = manager;
         _signInManager = signInManager;
