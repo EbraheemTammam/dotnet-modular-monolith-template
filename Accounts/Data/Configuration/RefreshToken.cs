@@ -14,6 +14,6 @@ internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken
                .HasForeignKey<RefreshToken>(u => u.UserId);
 
         builder.HasIndex(u => u.UserId);
-        builder.HasIndex(u => u.Token);
+        builder.HasIndex(u => u.TokenHash);
     }
 }

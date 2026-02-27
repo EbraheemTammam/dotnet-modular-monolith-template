@@ -22,27 +22,22 @@ if (args.Length > 0)
     using var scope = app.Services.CreateScope();
     var rootCommand = new RootCommand("ASP.NET Core CLI commands");
 
-    if (args[0].ToLower() == "createsuperuser")
-    {
-        var command = scope.ServiceProvider.GetRequiredService<CreateSuperUserCommand>();
-        rootCommand.Subcommands.Add(command.CreateCommand());
-    }
-    else if (args[0].ToLower() == "startapp")
-    {
-        var command = scope.ServiceProvider.GetRequiredService<StartAppCommand>();
-        rootCommand.Subcommands.Add(command.CreateCommand());
-    }
-    else if (args[0].ToLower() == "makemigrations")
-    {
-        if (args.Length < 2) args = args.Concat(modules[1..]).ToArray();
-        if (!modules.Contains(args[1]))
-        {
-            Console.WriteLine($"Module '{args[1]}' not found.");
-            return;
-        }
-        var command = scope.ServiceProvider.GetRequiredService<MakeMigrationsCommand>();
-        rootCommand.Subcommands.Add(command.CreateCommand());
-    }
+    rootCommand.Subcommands.Add(
+        scope.ServiceProvider
+            .GetRequiredService<CreateSuperUserCommand>()
+            .CreateCommand()
+    );
+    rootCommand.Subcommands.Add(
+        scope.ServiceProvider
+            .GetRequiredService<StartAppCommand>()
+            .CreateCommand()
+    );
+    rootCommand.Subcommands.Add(
+        scope.ServiceProvider
+            .GetRequiredService<MakeMigrationsCommand>()
+            .CreateCommand()
+    );
+
     await rootCommand.Parse(args).InvokeAsync();
 }
 else

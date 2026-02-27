@@ -2,9 +2,9 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Isopoh.Cryptography.Argon2;
 
-namespace Accounts.Utilities;
+namespace Accounts.Hashers;
 
-public class Argon2PasswordHasher<TUser> : IPasswordHasher<TUser> where TUser : class
+internal class Argon2PasswordHasher<TUser> : IPasswordHasher<TUser> where TUser : class
 {
     private readonly IPasswordHasher<TUser> _fallbackHasher;
 

@@ -27,7 +27,7 @@ public static class ServiceExtensions
         {
             try
             {
-                string typeName = $"{module}.Utilities.{module}ModuleRegistrar, {module}";
+                string typeName = $"{module}.{module}ModuleRegistrar, {module}";
                 Type? registrarType = Type.GetType(typeName);
 
                 if (registrarType == null || !typeof(IModuleRegistrar).IsAssignableFrom(registrarType))

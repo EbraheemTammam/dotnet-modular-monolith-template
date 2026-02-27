@@ -36,7 +36,7 @@ public abstract class ApiBaseController : ControllerBase
         {
             StatusCodes.Status400BadRequest => BadRequest(message),
             StatusCodes.Status401Unauthorized => Unauthorized(),
-            StatusCodes.Status403Forbidden => Forbid(message),
+            StatusCodes.Status403Forbidden => Forbid(message ?? "Permission denied"),
             StatusCodes.Status404NotFound => NotFound(message),
             StatusCodes.Status409Conflict => Conflict(message),
             StatusCodes.Status500InternalServerError => StatusCode(statusCode, message),

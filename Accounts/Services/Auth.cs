@@ -18,7 +18,7 @@ internal class AuthService : IAuthService
         _signInManager = signInManager;
     }
 
-    public async Task<Response> LoginAsync(LoginDTO loginDTO)
+    public async Task<Response> LoginAsync(LoginDTO loginDTO, CancellationToken ct = default)
     {
         User? user = await _userManager.FindByEmailAsync(loginDTO.Email);
         if(user is not null)
@@ -29,9 +29,14 @@ internal class AuthService : IAuthService
         return Response.UnAuthorized;
     }
 
-    public async Task<Response> LogoutAsync()
+    public async Task<Response> LogoutAsync(string? refreshToken = default, CancellationToken ct = default)
     {
         await _signInManager.SignOutAsync();
         return Response.Success();
+    }
+
+    public Task<Response> RefreshTokenAsync(string refreshToken, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
     }
 }

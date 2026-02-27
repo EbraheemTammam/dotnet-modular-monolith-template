@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Interfaces;
 using Shared.Commands;
 
-namespace Shared.Utilities;
+namespace Shared;
 
 internal class SharedModuleRegistrar : IModuleRegistrar
 {

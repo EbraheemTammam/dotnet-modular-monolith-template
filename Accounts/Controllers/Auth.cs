@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.Controllers;
 using Accounts.DTOs;
 using Accounts.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Accounts.Controllers;
 
@@ -15,10 +16,14 @@ public class AuthController : ApiBaseController
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> Login(LoginDTO loginDTO) =>
-        HandleResult(await _authService.LoginAsync(loginDTO));
+    public async Task<ActionResult> Login(LoginDTO loginDTO, CancellationToken ct) =>
+        HandleResult(await _authService.LoginAsync(loginDTO, ct));
+
+    [HttpPost("token-refresh")]
+    public async Task<ActionResult> RefreshToken([FromBody, Required] string refreshToken, CancellationToken ct) =>
+        HandleResult(await _authService.RefreshTokenAsync(refreshToken, ct));
 
     [HttpPost("logout")]
-    public async Task<ActionResult> Logout() =>
-        HandleResult(await _authService.LogoutAsync());
+    public async Task<ActionResult> Logout([FromBody, Required] string refreshToken, CancellationToken ct) =>
+        HandleResult(await _authService.LogoutAsync(refreshToken, ct));
 }

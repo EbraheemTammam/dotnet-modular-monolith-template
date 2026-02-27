@@ -1,11 +1,16 @@
 namespace Accounts.Models;
 
-public class RefreshToken
+public sealed class RefreshToken
 {
     public Guid Id { get; set; }
-    public required string Token { get; set; }
-    public DateTime Expiry { get; set; }
-    public bool IsRevoked { get; set; } = false;
     public Guid UserId { get; set; }
-    public User? User { get; set; }
+    public string TokenHash { get; set; } = default!;
+    public DateTime ExpiresAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? RevokedAt { get; set; }
+
+    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsRevoked => RevokedAt != null;
+
+    public User? User;
 }

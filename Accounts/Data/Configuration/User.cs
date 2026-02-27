@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using Accounts.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Accounts.Data.Configuration;
 
@@ -16,5 +17,9 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.Email);
         builder.HasIndex(u => u.PhoneNumber);
+
+        builder.HasMany(u => u.Roles)
+               .WithMany()
+               .UsingEntity<IdentityUserRole<Guid>>();
     }
 }

@@ -12,8 +12,10 @@ using Accounts.Models;
 using Accounts.Commands;
 using Accounts.Interfaces;
 using Accounts.Services;
+using Accounts.Hashers;
+using Accounts.Settings;
 
-namespace Accounts.Utilities;
+namespace Accounts;
 
 internal class AccountsModuleRegistrar : IModuleRegistrar
 {
@@ -32,7 +34,6 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
         .AddEntityFrameworkStores<AccountsDbContext>()
         .AddDefaultTokenProviders();
 
-        services.AddAuthentication();
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -52,36 +53,18 @@ internal class AccountsModuleRegistrar : IModuleRegistrar
                     Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY")!)
                 )
             };
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    var accessToken = context.Request.Query["access_token"];
-                    var path = context.HttpContext.Request.Path;
-                    if (!string.IsNullOrEmpty(accessToken) &&
-                        (
-                            path.StartsWithSegments("/hubs/location") ||
-                            path.StartsWithSegments("/hubs/ride-request")
-                        )
-                    )
-                    {
-                        context.Token = accessToken;
-                    }
-                    return Task.CompletedTask;
-                }
-            };
         });
         services.AddAuthorization();
 
         // cli
         services.AddScoped<CreateSuperUserCommand>();
-        // repositories
-        services.AddScoped<VerificationManager>();
+        // settings
+        services.AddSingleton<JwtOptions>();
         // internals
         services.AddScoped<HttpContextAccessor>();
         // hashers
         services.AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
         // services
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, JWTService>();
     }
 }
