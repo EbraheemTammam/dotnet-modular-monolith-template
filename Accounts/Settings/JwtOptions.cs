@@ -16,15 +16,26 @@ internal sealed class JwtOptions
         string? accessTokenLifetime = Environment.GetEnvironmentVariable("JWT_ACCESS_TOKEN_MINUTES");
         string? refreshTokenLifetime = Environment.GetEnvironmentVariable("JWT_REFRESH_TOKEN_DAYS");
 
-        if (
-            string.IsNullOrEmpty(issuer) ||
-            string.IsNullOrEmpty(audience) ||
-            string.IsNullOrEmpty(secret) ||
-            string.IsNullOrEmpty(accessTokenLifetime) ||
-            string.IsNullOrEmpty(refreshTokenLifetime) ||
-            int.TryParse(accessTokenLifetime, out int accessTokenMinutes) ||
-            int.TryParse(refreshTokenLifetime, out int refreshTokenDays) 
-        ) throw new ArgumentNullException("Jwt data is broken, make sure you set the environment variables correctly");
+        if (string.IsNullOrEmpty(issuer))
+            throw new ArgumentNullException(nameof(issuer));
+        
+        if (string.IsNullOrEmpty(audience))
+            throw new ArgumentNullException(nameof(audience));
+
+        if (string.IsNullOrEmpty(secret))
+            throw new ArgumentNullException(nameof(secret));
+
+        if (string.IsNullOrEmpty(accessTokenLifetime))
+            throw new ArgumentNullException(nameof(accessTokenLifetime));
+            
+        if (string.IsNullOrEmpty(refreshTokenLifetime))
+            throw new ArgumentNullException(nameof(refreshTokenLifetime));
+        
+        if (!int.TryParse(accessTokenLifetime, out int accessTokenMinutes))
+            throw new ArgumentException("Access token minutes should be an integer", nameof(accessTokenLifetime));
+
+        if (int.TryParse(refreshTokenLifetime, out int refreshTokenDays)) 
+            throw new ArgumentException("Refresh token days should be an integer", nameof(refreshTokenLifetime));
 
         this.Issuer = issuer;
         this.Audience = audience;

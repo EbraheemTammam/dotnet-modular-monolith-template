@@ -57,18 +57,25 @@ public static class ServiceExtensions
         }
     }
 
-    public static IServiceCollection AddCorsConfiguration(this IServiceCollection services) =>
-        services.AddCors(options =>
+    public static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
+    {
+        string? allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        if (string.IsNullOrEmpty(allowedOrigins))
+            throw new ArgumentNullException(nameof(allowedOrigins));
+
+        return services.AddCors(options =>
             {
                 options.AddPolicy(
                     "CorsPolicy",
-                    builder => builder.WithOrigins(Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")!.Split(","))
-                                      .AllowCredentials()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader()
+                    builder => builder
+                        .WithOrigins(allowedOrigins.Split(","))
+                        .AllowCredentials()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
                 );
             }
         );
+    }
 
     public static IServiceCollection AddIISIntegrationConfiguration(this IServiceCollection services) =>
         services.Configure<IISOptions>(options => { });
